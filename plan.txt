@@ -1,0 +1,1228 @@
+[0m[1mdata.aws_iam_policy_document.region_restriction["WorkshopOnlyAccess"]: Reading...[0m[0m
+[0m[1mdata.aws_organizations_organization.this: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.region_restriction["ReadOnlyAccess"]: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.region_restriction["PowerUserAccess"]: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.region_restriction["AdministratorAccess"]: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.region_restriction["AWSTransformAccess"]: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.power_user_access: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.partner_demo_access: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.infra_modify_only: Reading...[0m[0m
+[0m[1mdata.aws_ssoadmin_instances.this: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.region_restriction["PowerUserAccess"]: Read complete after 0s [id=2378317728][0m
+[0m[1mdata.aws_iam_policy_document.region_restriction["WorkshopOnlyAccess"]: Read complete after 0s [id=2378317728][0m
+[0m[1mdata.aws_iam_policy_document.region_restriction["AWSTransformAccess"]: Read complete after 0s [id=3115412570][0m
+[0m[1mdata.aws_iam_policy_document.region_restriction["AdministratorAccess"]: Read complete after 0s [id=2378317728][0m
+[0m[1mdata.aws_iam_policy_document.power_user_access: Read complete after 0s [id=2260885121][0m
+[0m[1mdata.aws_iam_policy_document.partner_demo_access: Read complete after 0s [id=2706014181][0m
+[0m[1mdata.aws_iam_policy_document.region_restriction["ReadOnlyAccess"]: Read complete after 0s [id=2378317728][0m
+[0m[1mdata.aws_iam_policy_document.infra_modify_only: Read complete after 0s [id=4270771743][0m
+[0m[1mdata.aws_iam_policy_document.permission_set_inline["PowerUserAccess"]: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.permission_set_inline["AdministratorAccess"]: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.permission_set_inline["WorkshopOnlyAccess"]: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.permission_set_inline["AWSTransformAccess"]: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.permission_set_inline["ReadOnlyAccess"]: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.permission_set_inline["PowerUserAccess"]: Read complete after 0s [id=4165908866][0m
+[0m[1mdata.aws_iam_policy_document.permission_set_inline["AWSTransformAccess"]: Read complete after 0s [id=3898706133][0m
+[0m[1mdata.aws_iam_policy_document.permission_set_inline["WorkshopOnlyAccess"]: Read complete after 0s [id=1102613805][0m
+[0m[1mdata.aws_iam_policy_document.permission_set_inline["AdministratorAccess"]: Read complete after 0s [id=2378317728][0m
+[0m[1mdata.aws_iam_policy_document.permission_set_inline["ReadOnlyAccess"]: Read complete after 0s [id=2378317728][0m
+[0m[1mdata.aws_ssoadmin_instances.this: Read complete after 1s [id=us-west-2][0m
+[0m[1maws_ssoadmin_permission_set.this["AWSTransformAccess"]: Preparing import... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_permission_set.this["AdministratorAccess"]: Preparing import... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_permission_set.this["PowerUserAccess"]: Preparing import... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_permission_set.this["ReadOnlyAccess"]: Preparing import... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1mdata.aws_identitystore_group.this["Workshops"]: Reading...[0m[0m
+[0m[1mdata.aws_identitystore_group.this["AWSTransform"]: Reading...[0m[0m
+[0m[1maws_ssoadmin_permission_set.this["AWSTransformAccess"]: Refreshing state... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_permission_set.this["AdministratorAccess"]: Refreshing state... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_permission_set.this["ReadOnlyAccess"]: Refreshing state... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1mdata.aws_identitystore_group.this["ReadOnly"]: Reading...[0m[0m
+[0m[1mdata.aws_identitystore_group.this["Administrators"]: Reading...[0m[0m
+[0m[1mdata.aws_identitystore_group.this["InfraModifiers"]: Reading...[0m[0m
+[0m[1maws_ssoadmin_permission_set.this["PowerUserAccess"]: Refreshing state... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1mdata.aws_organizations_organization.this: Read complete after 1s [id=o-vxa3ck8wnr][0m
+[0m[1maws_ssoadmin_permission_set.this["WorkshopOnlyAccess"]: Preparing import... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_permission_set.this["WorkshopOnlyAccess"]: Refreshing state... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1mdata.aws_identitystore_group.this["Developers"]: Reading...[0m[0m
+[0m[1maws_ssoadmin_managed_policy_attachment.this["AdministratorAccess"]: Preparing import... [id=arn:aws:iam::aws:policy/AdministratorAccess,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_managed_policy_attachment.this["ReadOnlyAccess"]: Preparing import... [id=arn:aws:iam::aws:policy/ReadOnlyAccess,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_permission_set_inline_policy.this["AWSTransformAccess"]: Preparing import... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_permission_set_inline_policy.this["AdministratorAccess"]: Preparing import... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_managed_policy_attachment.this["ReadOnlyAccess"]: Refreshing state... [id=arn:aws:iam::aws:policy/ReadOnlyAccess,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_permission_set_inline_policy.this["AWSTransformAccess"]: Refreshing state... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_permission_set_inline_policy.this["AdministratorAccess"]: Refreshing state... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_managed_policy_attachment.this["AdministratorAccess"]: Refreshing state... [id=arn:aws:iam::aws:policy/AdministratorAccess,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1mdata.aws_identitystore_group.this["AWSTransform"]: Read complete after 1s [id=0851f390-a021-7085-f0a1-1e79cf896e10][0m
+[0m[1maws_ssoadmin_permission_set_inline_policy.this["PowerUserAccess"]: Preparing import... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_permission_set_inline_policy.this["PowerUserAccess"]: Refreshing state... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1mdata.aws_identitystore_group.this["ReadOnly"]: Read complete after 1s [id=e8312330-20d1-7026-933e-0f99398f7b38][0m
+[0m[1maws_ssoadmin_permission_set_inline_policy.this["WorkshopOnlyAccess"]: Preparing import... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_permission_set_inline_policy.this["WorkshopOnlyAccess"]: Refreshing state... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1mdata.aws_identitystore_group.this["Developers"]: Read complete after 1s [id=58213310-7091-7021-1f02-090f2fdf3e71][0m
+[0m[1maws_ssoadmin_permission_set_inline_policy.this["ReadOnlyAccess"]: Preparing import... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_permission_set_inline_policy.this["ReadOnlyAccess"]: Refreshing state... [id=arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1mdata.aws_identitystore_group.this["Workshops"]: Read complete after 1s [id=58c11310-e091-702d-5931-f9465785750f][0m
+[0m[1mdata.aws_identitystore_group.this["InfraModifiers"]: Read complete after 1s [id=98314320-e051-7044-d542-94254e0bb4cc][0m
+[0m[1mdata.aws_identitystore_group.this["Administrators"]: Read complete after 1s [id=d8010390-f091-70e9-25c6-86301ba8a07e][0m
+[0m[1maws_ssoadmin_account_assignment.this["Production-Administrators-ReadOnlyAccess"]: Preparing import... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Production-ReadOnly-ReadOnlyAccess"]: Preparing import... [id=e8312330-20d1-7026-933e-0f99398f7b38,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["management-Administrators-ReadOnlyAccess"]: Preparing import... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,905081188087,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Sandbox-Workshops-PowerUserAccess"]: Preparing import... [id=58c11310-e091-702d-5931-f9465785750f,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Development-Administrators-ReadOnlyAccess"]: Preparing import... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Production-Administrators-PowerUserAccess"]: Preparing import... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Sandbox-Administrators-AWSTransformAccess"]: Preparing import... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Production-Administrators-ReadOnlyAccess"]: Refreshing state... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Sandbox-Workshops-PowerUserAccess"]: Refreshing state... [id=58c11310-e091-702d-5931-f9465785750f,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Sandbox-Administrators-AWSTransformAccess"]: Refreshing state... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Production-ReadOnly-ReadOnlyAccess"]: Refreshing state... [id=e8312330-20d1-7026-933e-0f99398f7b38,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Development-Administrators-ReadOnlyAccess"]: Refreshing state... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["management-Administrators-ReadOnlyAccess"]: Refreshing state... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,905081188087,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Production-Administrators-PowerUserAccess"]: Refreshing state... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Sandbox-Administrators-ReadOnlyAccess"]: Preparing import... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Sandbox-Administrators-ReadOnlyAccess"]: Refreshing state... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Development-Administrators-AdministratorAccess"]: Preparing import... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Development-Administrators-AdministratorAccess"]: Refreshing state... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["management-Administrators-PowerUserAccess"]: Preparing import... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,905081188087,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["management-Administrators-PowerUserAccess"]: Refreshing state... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,905081188087,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Production-Administrators-AdministratorAccess"]: Preparing import... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Production-Administrators-AdministratorAccess"]: Refreshing state... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Development-InfraModifiers-WorkshopOnlyAccess"]: Preparing import... [id=98314320-e051-7044-d542-94254e0bb4cc,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Production-Developers-PowerUserAccess"]: Preparing import... [id=58213310-7091-7021-1f02-090f2fdf3e71,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["management-Administrators-AdministratorAccess"]: Preparing import... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,905081188087,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Development-InfraModifiers-WorkshopOnlyAccess"]: Refreshing state... [id=98314320-e051-7044-d542-94254e0bb4cc,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Production-Developers-PowerUserAccess"]: Refreshing state... [id=58213310-7091-7021-1f02-090f2fdf3e71,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["management-Administrators-AdministratorAccess"]: Refreshing state... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,905081188087,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Sandbox-Administrators-PowerUserAccess"]: Preparing import... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Production-InfraModifiers-WorkshopOnlyAccess"]: Preparing import... [id=98314320-e051-7044-d542-94254e0bb4cc,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Production-InfraModifiers-WorkshopOnlyAccess"]: Refreshing state... [id=98314320-e051-7044-d542-94254e0bb4cc,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Sandbox-Administrators-PowerUserAccess"]: Refreshing state... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Development-Administrators-PowerUserAccess"]: Preparing import... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Development-Administrators-PowerUserAccess"]: Refreshing state... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Development-Developers-PowerUserAccess"]: Preparing import... [id=58213310-7091-7021-1f02-090f2fdf3e71,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Development-Developers-PowerUserAccess"]: Refreshing state... [id=58213310-7091-7021-1f02-090f2fdf3e71,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Sandbox-AWSTransform-AWSTransformAccess"]: Preparing import... [id=0851f390-a021-7085-f0a1-1e79cf896e10,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Sandbox-AWSTransform-AWSTransformAccess"]: Refreshing state... [id=0851f390-a021-7085-f0a1-1e79cf896e10,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Sandbox-Administrators-AdministratorAccess"]: Preparing import... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+[0m[1maws_ssoadmin_account_assignment.this["Sandbox-Administrators-AdministratorAccess"]: Refreshing state... [id=d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # aws_ssoadmin_account_assignment.this["Development-Administrators-AdministratorAccess"][0m will be updated in-place
+  # [0m(imported from "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6"
+        principal_id       = "d8010390-f091-70e9-25c6-86301ba8a07e"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Development-Administrators-PowerUserAccess"][0m will be updated in-place
+  # [0m(imported from "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5"
+        principal_id       = "d8010390-f091-70e9-25c6-86301ba8a07e"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Development-Administrators-ReadOnlyAccess"][0m will be updated in-place
+  # [0m(imported from "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259"
+        principal_id       = "d8010390-f091-70e9-25c6-86301ba8a07e"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Development-Developers-PowerUserAccess"][0m will be updated in-place
+  # [0m(imported from "58213310-7091-7021-1f02-090f2fdf3e71,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "58213310-7091-7021-1f02-090f2fdf3e71,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5"
+        principal_id       = "58213310-7091-7021-1f02-090f2fdf3e71"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Development-InfraModifiers-WorkshopOnlyAccess"][0m will be updated in-place
+  # [0m(imported from "98314320-e051-7044-d542-94254e0bb4cc,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "98314320-e051-7044-d542-94254e0bb4cc,GROUP,771650096229,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506"
+        principal_id       = "98314320-e051-7044-d542-94254e0bb4cc"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Production-Administrators-AdministratorAccess"][0m will be updated in-place
+  # [0m(imported from "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6"
+        principal_id       = "d8010390-f091-70e9-25c6-86301ba8a07e"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Production-Administrators-PowerUserAccess"][0m will be updated in-place
+  # [0m(imported from "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5"
+        principal_id       = "d8010390-f091-70e9-25c6-86301ba8a07e"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Production-Administrators-ReadOnlyAccess"][0m will be updated in-place
+  # [0m(imported from "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259"
+        principal_id       = "d8010390-f091-70e9-25c6-86301ba8a07e"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Production-Developers-PowerUserAccess"][0m will be updated in-place
+  # [0m(imported from "58213310-7091-7021-1f02-090f2fdf3e71,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "58213310-7091-7021-1f02-090f2fdf3e71,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5"
+        principal_id       = "58213310-7091-7021-1f02-090f2fdf3e71"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Production-InfraModifiers-WorkshopOnlyAccess"][0m will be updated in-place
+  # [0m(imported from "98314320-e051-7044-d542-94254e0bb4cc,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "98314320-e051-7044-d542-94254e0bb4cc,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506"
+        principal_id       = "98314320-e051-7044-d542-94254e0bb4cc"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Production-ReadOnly-ReadOnlyAccess"][0m will be updated in-place
+  # [0m(imported from "e8312330-20d1-7026-933e-0f99398f7b38,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "e8312330-20d1-7026-933e-0f99398f7b38,GROUP,598566032863,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259"
+        principal_id       = "e8312330-20d1-7026-933e-0f99398f7b38"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Sandbox-AWSTransform-AWSTransformAccess"][0m will be updated in-place
+  # [0m(imported from "0851f390-a021-7085-f0a1-1e79cf896e10,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "0851f390-a021-7085-f0a1-1e79cf896e10,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816"
+        principal_id       = "0851f390-a021-7085-f0a1-1e79cf896e10"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Sandbox-Administrators-AWSTransformAccess"][0m will be updated in-place
+  # [0m(imported from "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816"
+        principal_id       = "d8010390-f091-70e9-25c6-86301ba8a07e"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Sandbox-Administrators-AdministratorAccess"][0m will be updated in-place
+  # [0m(imported from "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6"
+        principal_id       = "d8010390-f091-70e9-25c6-86301ba8a07e"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Sandbox-Administrators-PowerUserAccess"][0m will be updated in-place
+  # [0m(imported from "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5"
+        principal_id       = "d8010390-f091-70e9-25c6-86301ba8a07e"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Sandbox-Administrators-ReadOnlyAccess"][0m will be updated in-place
+  # [0m(imported from "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259"
+        principal_id       = "d8010390-f091-70e9-25c6-86301ba8a07e"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["Sandbox-Workshops-PowerUserAccess"][0m will be updated in-place
+  # [0m(imported from "58c11310-e091-702d-5931-f9465785750f,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "58c11310-e091-702d-5931-f9465785750f,GROUP,337058058699,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5"
+        principal_id       = "58c11310-e091-702d-5931-f9465785750f"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["management-Administrators-AdministratorAccess"][0m will be updated in-place
+  # [0m(imported from "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,905081188087,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,905081188087,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6"
+        principal_id       = "d8010390-f091-70e9-25c6-86301ba8a07e"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["management-Administrators-PowerUserAccess"][0m will be updated in-place
+  # [0m(imported from "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,905081188087,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,905081188087,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5"
+        principal_id       = "d8010390-f091-70e9-25c6-86301ba8a07e"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_account_assignment.this["management-Administrators-ReadOnlyAccess"][0m will be updated in-place
+  # [0m(imported from "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,905081188087,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_account_assignment" "this" {
+        id                 = "d8010390-f091-70e9-25c6-86301ba8a07e,GROUP,905081188087,AWS_ACCOUNT,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259"
+        principal_id       = "d8010390-f091-70e9-25c6-86301ba8a07e"
+        principal_type     = "GROUP"
+        region             = "us-west-2"
+      # [33mWarning[0m: this attribute value will be marked as sensitive and will not
+      # display in UI output after applying this change.[0m The value is unchanged.
+      [33m~[0m[0m target_id          = (sensitive value)
+        target_type        = "AWS_ACCOUNT"
+    }
+
+[1m  # aws_ssoadmin_managed_policy_attachment.this["AdministratorAccess"][0m will be imported
+[0m    resource "aws_ssoadmin_managed_policy_attachment" "this" {
+        id                  = "arn:aws:iam::aws:policy/AdministratorAccess,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn        = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        managed_policy_arn  = "arn:aws:iam::aws:policy/AdministratorAccess"
+        managed_policy_name = "AdministratorAccess"
+        permission_set_arn  = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6"
+        region              = "us-west-2"
+    }
+
+[1m  # aws_ssoadmin_managed_policy_attachment.this["ReadOnlyAccess"][0m will be imported
+[0m    resource "aws_ssoadmin_managed_policy_attachment" "this" {
+        id                  = "arn:aws:iam::aws:policy/ReadOnlyAccess,arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn        = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        managed_policy_arn  = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+        managed_policy_name = "ReadOnlyAccess"
+        permission_set_arn  = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259"
+        region              = "us-west-2"
+    }
+
+[1m  # aws_ssoadmin_permission_set.this["AWSTransformAccess"][0m will be updated in-place
+  # [0m(imported from "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_permission_set" "this" {
+        arn              = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816"
+        created_date     = "2026-08-26T04:11:42Z"
+      [33m~[0m[0m description      = "AWS Transform demo cohort: web app sign-in plus deploying the fbctf demo app" [33m->[0m[0m "Partner demo cohort: web application sign-in plus deploying the demo stack"
+        id               = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn     = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        name             = "AWSTransformAccess"
+        region           = "us-west-2"
+        relay_state      = [90mnull[0m[0m
+        session_duration = "PT8H"
+        tags             = {}
+      [33m~[0m[0m tags_all         = {
+            "Created_by" = "Terraform"
+          [32m+[0m[0m "Managed_by" = "aws-access"
+        }
+    }
+
+[1m  # aws_ssoadmin_permission_set.this["AdministratorAccess"][0m will be updated in-place
+  # [0m(imported from "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_permission_set" "this" {
+        arn              = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6"
+        created_date     = "2026-03-15T04:28:22Z"
+        description      = "Full administrative access to all AWS services"
+        id               = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn     = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        name             = "AdministratorAccess"
+        region           = "us-west-2"
+        relay_state      = [90mnull[0m[0m
+        session_duration = "PT8H"
+        tags             = {}
+      [33m~[0m[0m tags_all         = {
+            "Created_by" = "Terraform"
+          [32m+[0m[0m "Managed_by" = "aws-access"
+        }
+    }
+
+[1m  # aws_ssoadmin_permission_set.this["PowerUserAccess"][0m will be updated in-place
+  # [0m(imported from "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_permission_set" "this" {
+        arn              = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5"
+        created_date     = "2026-03-15T05:33:06Z"
+      [33m~[0m[0m description      = "Read-only view of the CloudWatch Agent's resources, plus invoking its AgentCore runtime for demos" [33m->[0m[0m "Read-only observability access plus invoking the deployed agent runtime"
+        id               = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn     = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        name             = "PowerUserAccess"
+        region           = "us-west-2"
+        relay_state      = [90mnull[0m[0m
+        session_duration = "PT8H"
+        tags             = {}
+      [33m~[0m[0m tags_all         = {
+            "Created_by" = "Terraform"
+          [32m+[0m[0m "Managed_by" = "aws-access"
+        }
+    }
+
+[1m  # aws_ssoadmin_permission_set.this["ReadOnlyAccess"][0m will be updated in-place
+  # [0m(imported from "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_permission_set" "this" {
+        arn              = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259"
+        created_date     = "2026-03-15T04:28:22Z"
+        description      = "Read-only access to all resources across the organization"
+        id               = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn     = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        name             = "ReadOnlyAccess"
+        region           = "us-west-2"
+        relay_state      = [90mnull[0m[0m
+        session_duration = "PT8H"
+        tags             = {}
+      [33m~[0m[0m tags_all         = {
+            "Created_by" = "Terraform"
+          [32m+[0m[0m "Managed_by" = "aws-access"
+        }
+    }
+
+[1m  # aws_ssoadmin_permission_set.this["WorkshopOnlyAccess"][0m will be updated in-place
+  # [0m(imported from "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_permission_set" "this" {
+        arn              = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506"
+        created_date     = "2026-04-29T16:20:50Z"
+      [33m~[0m[0m description      = "Modify existing workshop infra (no create/destroy) plus invoke AgentCore runtime" [33m->[0m[0m "Modify existing workshop infrastructure (no create/destroy) plus invoke the agent runtime"
+        id               = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        instance_arn     = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        name             = "WorkshopOnlyAccess"
+        region           = "us-west-2"
+        relay_state      = [90mnull[0m[0m
+        session_duration = "PT8H"
+        tags             = {}
+      [33m~[0m[0m tags_all         = {
+            "Created_by" = "Terraform"
+          [32m+[0m[0m "Managed_by" = "aws-access"
+        }
+    }
+
+[1m  # aws_ssoadmin_permission_set_inline_policy.this["AWSTransformAccess"][0m will be updated in-place
+  # [0m(imported from "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c")
+[0m  [33m~[0m[0m resource "aws_ssoadmin_permission_set_inline_policy" "this" {
+        id                 = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+      [33m~[0m[0m inline_policy      = jsonencode(
+          [33m~[0m[0m {
+              [33m~[0m[0m Statement = [
+                    {
+                        Condition = {
+                            StringNotEquals = {
+                                "aws:RequestedRegion" = [
+                                    "us-west-2",
+                                    "us-east-1",
+                                ]
+                            }
+                        }
+                        Effect    = "Deny"
+                        NotAction = [
+                            "wafv2:*",
+                            "waf:*",
+                            "waf-regional:*",
+                            "trustedadvisor:*",
+                            "tax:*",
+                            "support:*",
+                            "sts:*",
+                            "shield:*",
+                            "route53domains:*",
+                            "route53:*",
+                            "purchase-orders:*",
+                            "payments:*",
+                            "organizations:*",
+                            "invoicing:*",
+                            "importexport:*",
+                            "iam:*",
+                            "health:*",
+                            "globalaccelerator:*",
+                            "freetier:*",
+                            "cur:*",
+                            "consolidatedbilling:*",
+                            "cloudfront:*",
+                            "chime:*",
+                            "ce:*",
+                            "budgets:*",
+                            "billingconductor:*",
+                            "billing:*",
+                            "aws-portal:*",
+                            "aws-marketplace:*",
+                            "aws-marketplace-management:*",
+                            "account:*",
+                            "a4b:*",
+                        ]
+                        Resource  = "*"
+                        Sid       = "DenyActionsOutsideApprovedRegion"
+                    },
+                    {
+                        Action   = "iam:ListAccountAliases"
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "ConsoleBaseline"
+                    },
+                  [33m~[0m[0m {
+                        Action   = [
+                            "transform:List*",
+                            "transform:Get*",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                      [33m~[0m[0m Sid      = "AWSTransformReadOnly" [33m->[0m[0m "PartnerServiceReadOnly"
+                    },
+                  [33m~[0m[0m {
+                        Action   = "transform:AccessTransformProfile"
+                        Effect   = "Allow"
+                        Resource = "arn:aws:transform:us-east-1:*:profile/*"
+                      [33m~[0m[0m Sid      = "AWSTransformWebAppAccess" [33m->[0m[0m "PartnerServiceWebAppAccess"
+                    },
+                  [33m~[0m[0m {
+                        Action   = [
+                            "ssm:*",
+                            "rds:*",
+                            "logs:*",
+                            "kms:ListAliases",
+                            "kms:DescribeKey",
+                            "elasticloadbalancing:*",
+                            "elasticache:*",
+                            "ec2:*",
+                            "cloudwatch:*",
+                            "autoscaling:*",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                      [33m~[0m[0m Sid      = "FbctfInfraDeploy" [33m->[0m[0m "DemoInfraDeploy"
+                    },
+                  [33m~[0m[0m {
+                        Action   = "s3:*"
+                        Effect   = "Allow"
+                        Resource = [
+                            "arn:aws:s3:::fbctf-*/*",
+                            "arn:aws:s3:::fbctf-*",
+                        ]
+                      [33m~[0m[0m Sid      = "FbctfS3" [33m->[0m[0m "DemoS3"
+                    },
+                  [33m~[0m[0m {
+                        Action   = [
+                            "iam:List*",
+                            "iam:Get*",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                      [33m~[0m[0m Sid      = "FbctfIamRead" [33m->[0m[0m "DemoIamRead"
+                    },
+                  [33m~[0m[0m {
+                        Action   = [
+                            "iam:UntagRole",
+                            "iam:UntagInstanceProfile",
+                            "iam:TagRole",
+                            "iam:TagInstanceProfile",
+                            "iam:RemoveRoleFromInstanceProfile",
+                            "iam:PutRolePolicy",
+                            "iam:DetachRolePolicy",
+                            "iam:DeleteRolePolicy",
+                            "iam:DeleteRole",
+                            "iam:DeleteInstanceProfile",
+                            "iam:CreateRole",
+                            "iam:CreateInstanceProfile",
+                            "iam:AttachRolePolicy",
+                            "iam:AddRoleToInstanceProfile",
+                        ]
+                        Effect   = "Allow"
+                        Resource = [
+                            "arn:aws:iam::*:role/fbctf-*",
+                            "arn:aws:iam::*:instance-profile/fbctf-*",
+                        ]
+                      [33m~[0m[0m Sid      = "FbctfIamWriteScoped" [33m->[0m[0m "DemoIamWriteScoped"
+                    },
+                  [33m~[0m[0m {
+                        Action    = "iam:PassRole"
+                        Condition = {
+                            StringEquals = {
+                                "iam:PassedToService" = "ec2.amazonaws.com"
+                            }
+                        }
+                        Effect    = "Allow"
+                        Resource  = "arn:aws:iam::*:role/fbctf-*"
+                      [33m~[0m[0m Sid       = "FbctfIamPassRole" [33m->[0m[0m "DemoIamPassRole"
+                    },
+                  [33m~[0m[0m {
+                        Action    = "iam:CreateServiceLinkedRole"
+                        Condition = {
+                            StringEquals = {
+                                "iam:AWSServiceName" = [
+                                    "autoscaling.amazonaws.com",
+                                    "elasticache.amazonaws.com",
+                                    "elasticloadbalancing.amazonaws.com",
+                                    "rds.amazonaws.com",
+                                ]
+                            }
+                        }
+                        Effect    = "Allow"
+                        Resource  = "*"
+                      [33m~[0m[0m Sid       = "FbctfServiceLinkedRoles" [33m->[0m[0m "DemoServiceLinkedRoles"
+                    },
+                  [33m~[0m[0m {
+                        Action   = "secretsmanager:*"
+                        Effect   = "Allow"
+                        Resource = [
+                            "arn:aws:secretsmanager:*:*:secret:rds!*",
+                            "arn:aws:secretsmanager:*:*:secret:fbctf-*",
+                        ]
+                      [33m~[0m[0m Sid      = "FbctfSecrets" [33m->[0m[0m "DemoSecrets"
+                    },
+                ]
+                Version   = "2012-10-17"
+            }
+        )
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816"
+        region             = "us-west-2"
+    }
+
+[1m  # aws_ssoadmin_permission_set_inline_policy.this["AdministratorAccess"][0m will be imported
+[0m    resource "aws_ssoadmin_permission_set_inline_policy" "this" {
+        id                 = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        inline_policy      = jsonencode(
+            {
+                Statement = [
+                    {
+                        Condition = {
+                            StringNotEquals = {
+                                "aws:RequestedRegion" = "us-west-2"
+                            }
+                        }
+                        Effect    = "Deny"
+                        NotAction = [
+                            "wafv2:*",
+                            "waf:*",
+                            "waf-regional:*",
+                            "trustedadvisor:*",
+                            "tax:*",
+                            "support:*",
+                            "sts:*",
+                            "shield:*",
+                            "route53domains:*",
+                            "route53:*",
+                            "purchase-orders:*",
+                            "payments:*",
+                            "organizations:*",
+                            "invoicing:*",
+                            "importexport:*",
+                            "iam:*",
+                            "health:*",
+                            "globalaccelerator:*",
+                            "freetier:*",
+                            "cur:*",
+                            "consolidatedbilling:*",
+                            "cloudfront:*",
+                            "chime:*",
+                            "ce:*",
+                            "budgets:*",
+                            "billingconductor:*",
+                            "billing:*",
+                            "aws-portal:*",
+                            "aws-marketplace:*",
+                            "aws-marketplace-management:*",
+                            "account:*",
+                            "a4b:*",
+                        ]
+                        Resource  = "*"
+                        Sid       = "DenyActionsOutsideApprovedRegion"
+                    },
+                ]
+                Version   = "2012-10-17"
+            }
+        )
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6"
+        region             = "us-west-2"
+    }
+
+[1m  # aws_ssoadmin_permission_set_inline_policy.this["PowerUserAccess"][0m will be imported
+[0m    resource "aws_ssoadmin_permission_set_inline_policy" "this" {
+        id                 = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        inline_policy      = jsonencode(
+            {
+                Statement = [
+                    {
+                        Condition = {
+                            StringNotEquals = {
+                                "aws:RequestedRegion" = "us-west-2"
+                            }
+                        }
+                        Effect    = "Deny"
+                        NotAction = [
+                            "wafv2:*",
+                            "waf:*",
+                            "waf-regional:*",
+                            "trustedadvisor:*",
+                            "tax:*",
+                            "support:*",
+                            "sts:*",
+                            "shield:*",
+                            "route53domains:*",
+                            "route53:*",
+                            "purchase-orders:*",
+                            "payments:*",
+                            "organizations:*",
+                            "invoicing:*",
+                            "importexport:*",
+                            "iam:*",
+                            "health:*",
+                            "globalaccelerator:*",
+                            "freetier:*",
+                            "cur:*",
+                            "consolidatedbilling:*",
+                            "cloudfront:*",
+                            "chime:*",
+                            "ce:*",
+                            "budgets:*",
+                            "billingconductor:*",
+                            "billing:*",
+                            "aws-portal:*",
+                            "aws-marketplace:*",
+                            "aws-marketplace-management:*",
+                            "account:*",
+                            "a4b:*",
+                        ]
+                        Resource  = "*"
+                        Sid       = "DenyActionsOutsideApprovedRegion"
+                    },
+                    {
+                        Action   = [
+                            "bedrock-agentcore:List*",
+                            "bedrock-agentcore:Get*",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "AgentCoreReadOnly"
+                    },
+                    {
+                        Action   = "bedrock-agentcore:InvokeAgentRuntime"
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "InvokeAgentRuntime"
+                    },
+                    {
+                        Action   = [
+                            "bedrock:List*",
+                            "bedrock:Get*",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "BedrockReadOnly"
+                    },
+                    {
+                        Action   = [
+                            "cloudwatch:List*",
+                            "cloudwatch:Get*",
+                            "cloudwatch:Describe*",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "CloudWatchReadOnly"
+                    },
+                    {
+                        Action   = [
+                            "logs:StopQuery",
+                            "logs:StopLiveTail",
+                            "logs:StartQuery",
+                            "logs:StartLiveTail",
+                            "logs:List*",
+                            "logs:Get*",
+                            "logs:FilterLogEvents",
+                            "logs:Describe*",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "LogsReadOnly"
+                    },
+                    {
+                        Action   = [
+                            "xray:List*",
+                            "xray:Get*",
+                            "xray:BatchGet*",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "XRayReadOnly"
+                    },
+                    {
+                        Action   = [
+                            "grafana:List*",
+                            "grafana:Describe*",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "GrafanaReadOnly"
+                    },
+                    {
+                        Action   = [
+                            "rds:List*",
+                            "rds:Describe*",
+                            "lambda:List*",
+                            "lambda:Get*",
+                            "ec2:Describe*",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "ResourceDiscoveryReadOnly"
+                    },
+                    {
+                        Action   = [
+                            "ecr:List*",
+                            "ecr:Get*",
+                            "ecr:Describe*",
+                            "ecr:BatchGetImage",
+                            "ecr:BatchCheckLayerAvailability",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "EcrReadOnly"
+                    },
+                    {
+                        Action   = [
+                            "cloudtrail:LookupEvents",
+                            "cloudtrail:List*",
+                            "cloudtrail:Get*",
+                            "cloudtrail:Describe*",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "CloudTrailReadOnly"
+                    },
+                    {
+                        Action   = [
+                            "amplify:List*",
+                            "amplify:Get*",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "AmplifyReadOnly"
+                    },
+                ]
+                Version   = "2012-10-17"
+            }
+        )
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5"
+        region             = "us-west-2"
+    }
+
+[1m  # aws_ssoadmin_permission_set_inline_policy.this["ReadOnlyAccess"][0m will be imported
+[0m    resource "aws_ssoadmin_permission_set_inline_policy" "this" {
+        id                 = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        inline_policy      = jsonencode(
+            {
+                Statement = [
+                    {
+                        Condition = {
+                            StringNotEquals = {
+                                "aws:RequestedRegion" = "us-west-2"
+                            }
+                        }
+                        Effect    = "Deny"
+                        NotAction = [
+                            "wafv2:*",
+                            "waf:*",
+                            "waf-regional:*",
+                            "trustedadvisor:*",
+                            "tax:*",
+                            "support:*",
+                            "sts:*",
+                            "shield:*",
+                            "route53domains:*",
+                            "route53:*",
+                            "purchase-orders:*",
+                            "payments:*",
+                            "organizations:*",
+                            "invoicing:*",
+                            "importexport:*",
+                            "iam:*",
+                            "health:*",
+                            "globalaccelerator:*",
+                            "freetier:*",
+                            "cur:*",
+                            "consolidatedbilling:*",
+                            "cloudfront:*",
+                            "chime:*",
+                            "ce:*",
+                            "budgets:*",
+                            "billingconductor:*",
+                            "billing:*",
+                            "aws-portal:*",
+                            "aws-marketplace:*",
+                            "aws-marketplace-management:*",
+                            "account:*",
+                            "a4b:*",
+                        ]
+                        Resource  = "*"
+                        Sid       = "DenyActionsOutsideApprovedRegion"
+                    },
+                ]
+                Version   = "2012-10-17"
+            }
+        )
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259"
+        region             = "us-west-2"
+    }
+
+[1m  # aws_ssoadmin_permission_set_inline_policy.this["WorkshopOnlyAccess"][0m will be imported
+[0m    resource "aws_ssoadmin_permission_set_inline_policy" "this" {
+        id                 = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506,arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        inline_policy      = jsonencode(
+            {
+                Statement = [
+                    {
+                        Condition = {
+                            StringNotEquals = {
+                                "aws:RequestedRegion" = "us-west-2"
+                            }
+                        }
+                        Effect    = "Deny"
+                        NotAction = [
+                            "wafv2:*",
+                            "waf:*",
+                            "waf-regional:*",
+                            "trustedadvisor:*",
+                            "tax:*",
+                            "support:*",
+                            "sts:*",
+                            "shield:*",
+                            "route53domains:*",
+                            "route53:*",
+                            "purchase-orders:*",
+                            "payments:*",
+                            "organizations:*",
+                            "invoicing:*",
+                            "importexport:*",
+                            "iam:*",
+                            "health:*",
+                            "globalaccelerator:*",
+                            "freetier:*",
+                            "cur:*",
+                            "consolidatedbilling:*",
+                            "cloudfront:*",
+                            "chime:*",
+                            "ce:*",
+                            "budgets:*",
+                            "billingconductor:*",
+                            "billing:*",
+                            "aws-portal:*",
+                            "aws-marketplace:*",
+                            "aws-marketplace-management:*",
+                            "account:*",
+                            "a4b:*",
+                        ]
+                        Resource  = "*"
+                        Sid       = "DenyActionsOutsideApprovedRegion"
+                    },
+                    {
+                        Action   = [
+                            "logs:StopLiveTail",
+                            "logs:StartLiveTail",
+                            "logs:List*",
+                            "logs:Get*",
+                            "logs:FilterLogEvents",
+                            "logs:Describe*",
+                            "iam:List*",
+                            "iam:Get*",
+                            "ecr:List*",
+                            "ecr:Get*",
+                            "ecr:Describe*",
+                            "ecr:BatchGetImage",
+                            "ecr:BatchCheckLayerAvailability",
+                            "bedrock:RetrieveAndGenerate",
+                            "bedrock:Retrieve",
+                            "bedrock:List*",
+                            "bedrock:Get*",
+                            "bedrock-agentcore:List*",
+                            "bedrock-agentcore:Get*",
+                            "aoss:List*",
+                            "aoss:Get*",
+                            "aoss:BatchGet*",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "WorkshopReadOnly"
+                    },
+                    {
+                        Action   = [
+                            "logs:UntagResource",
+                            "logs:TagResource",
+                            "logs:PutRetentionPolicy",
+                            "iam:UpdateRoleDescription",
+                            "iam:UpdateRole",
+                            "iam:UpdateAssumeRolePolicy",
+                            "iam:UntagRole",
+                            "iam:TagRole",
+                            "iam:PutRolePolicy",
+                            "iam:PassRole",
+                            "iam:DetachRolePolicy",
+                            "iam:AttachRolePolicy",
+                            "ecr:UploadLayerPart",
+                            "ecr:UntagResource",
+                            "ecr:TagResource",
+                            "ecr:SetRepositoryPolicy",
+                            "ecr:PutLifecyclePolicy",
+                            "ecr:PutImage",
+                            "ecr:InitiateLayerUpload",
+                            "ecr:GetAuthorizationToken",
+                            "ecr:CompleteLayerUpload",
+                            "bedrock:UpdateKnowledgeBase",
+                            "bedrock:UpdateDataSource",
+                            "bedrock:UntagResource",
+                            "bedrock:TagResource",
+                            "bedrock-agentcore:UpdateMemory",
+                            "bedrock-agentcore:UpdateAgentRuntimeEndpoint",
+                            "bedrock-agentcore:UpdateAgentRuntime",
+                            "bedrock-agentcore:UntagResource",
+                            "bedrock-agentcore:TagResource",
+                            "aoss:UpdateSecurityPolicy",
+                            "aoss:UpdateLifecyclePolicy",
+                            "aoss:UpdateCollection",
+                            "aoss:UpdateAccessPolicy",
+                            "aoss:UntagResource",
+                            "aoss:TagResource",
+                            "aoss:DashboardsAccessAll",
+                            "aoss:APIAccessAll",
+                        ]
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "WorkshopModifyOnly"
+                    },
+                    {
+                        Action   = [
+                            "logs:DeleteRetentionPolicy",
+                            "logs:DeleteLogStream",
+                            "logs:DeleteLogGroup",
+                            "logs:CreateLogStream",
+                            "logs:CreateLogGroup",
+                            "iam:DeleteServiceLinkedRole",
+                            "iam:DeleteRolePolicy",
+                            "iam:DeleteRole",
+                            "iam:DeletePolicy",
+                            "iam:CreateServiceLinkedRole",
+                            "iam:CreateRole",
+                            "iam:CreatePolicy",
+                            "ecr:DeleteRepositoryPolicy",
+                            "ecr:DeleteRepository",
+                            "ecr:DeleteLifecyclePolicy",
+                            "ecr:CreateRepository",
+                            "bedrock:DeleteKnowledgeBase",
+                            "bedrock:DeleteDataSource",
+                            "bedrock:CreateKnowledgeBase",
+                            "bedrock:CreateDataSource",
+                            "bedrock-agentcore:DeleteMemory",
+                            "bedrock-agentcore:DeleteAgentRuntimeEndpoint",
+                            "bedrock-agentcore:DeleteAgentRuntime",
+                            "bedrock-agentcore:CreateMemory",
+                            "bedrock-agentcore:CreateAgentRuntimeEndpoint",
+                            "bedrock-agentcore:CreateAgentRuntime",
+                            "aoss:DeleteSecurityPolicy",
+                            "aoss:DeleteLifecyclePolicy",
+                            "aoss:DeleteCollection",
+                            "aoss:DeleteAccessPolicy",
+                            "aoss:CreateSecurityPolicy",
+                            "aoss:CreateLifecyclePolicy",
+                            "aoss:CreateCollection",
+                            "aoss:CreateAccessPolicy",
+                        ]
+                        Effect   = "Deny"
+                        Resource = "*"
+                        Sid      = "DenyCreateAndDestroy"
+                    },
+                    {
+                        Action   = [
+                            "s3:PutObject",
+                            "s3:ListBucket",
+                            "s3:GetObject",
+                            "s3:GetBucketVersioning",
+                            "s3:GetBucketLocation",
+                        ]
+                        Effect   = "Allow"
+                        Resource = [
+                            "arn:aws:s3:::cloudcrafters-workshop-2026-tfstate/*",
+                            "arn:aws:s3:::cloudcrafters-workshop-2026-tfstate",
+                        ]
+                        Sid      = "TerraformStateAccess"
+                    },
+                    {
+                        Action   = "bedrock-agentcore:InvokeAgentRuntime"
+                        Effect   = "Allow"
+                        Resource = "*"
+                        Sid      = "InvokeAgentRuntime"
+                    },
+                ]
+                Version   = "2012-10-17"
+            }
+        )
+        instance_arn       = "arn:aws:sso:::instance/ssoins-790703399ddfda5c"
+        permission_set_arn = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506"
+        region             = "us-west-2"
+    }
+
+[1mPlan:[0m 32 to import, 0 to add, 26 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [32m+[0m[0m assignments         = [
+      [32m+[0m[0m "Development-Administrators-AdministratorAccess",
+      [32m+[0m[0m "Development-Administrators-PowerUserAccess",
+      [32m+[0m[0m "Development-Administrators-ReadOnlyAccess",
+      [32m+[0m[0m "Development-Developers-PowerUserAccess",
+      [32m+[0m[0m "Development-InfraModifiers-WorkshopOnlyAccess",
+      [32m+[0m[0m "Production-Administrators-AdministratorAccess",
+      [32m+[0m[0m "Production-Administrators-PowerUserAccess",
+      [32m+[0m[0m "Production-Administrators-ReadOnlyAccess",
+      [32m+[0m[0m "Production-Developers-PowerUserAccess",
+      [32m+[0m[0m "Production-InfraModifiers-WorkshopOnlyAccess",
+      [32m+[0m[0m "Production-ReadOnly-ReadOnlyAccess",
+      [32m+[0m[0m "Sandbox-AWSTransform-AWSTransformAccess",
+      [32m+[0m[0m "Sandbox-Administrators-AWSTransformAccess",
+      [32m+[0m[0m "Sandbox-Administrators-AdministratorAccess",
+      [32m+[0m[0m "Sandbox-Administrators-PowerUserAccess",
+      [32m+[0m[0m "Sandbox-Administrators-ReadOnlyAccess",
+      [32m+[0m[0m "Sandbox-Workshops-PowerUserAccess",
+      [32m+[0m[0m "management-Administrators-AdministratorAccess",
+      [32m+[0m[0m "management-Administrators-PowerUserAccess",
+      [32m+[0m[0m "management-Administrators-ReadOnlyAccess",
+    ]
+  [32m+[0m[0m permission_set_arns = {
+      [32m+[0m[0m AWSTransformAccess  = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f6a277f04b223816"
+      [32m+[0m[0m AdministratorAccess = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-f510d72c6125c5b6"
+      [32m+[0m[0m PowerUserAccess     = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-ba7dd6569f8948f5"
+      [32m+[0m[0m ReadOnlyAccess      = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-bbca2343ed635259"
+      [32m+[0m[0m WorkshopOnlyAccess  = "arn:aws:sso:::permissionSet/ssoins-790703399ddfda5c/ps-18fbda67eb2c2506"
+    }
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.
