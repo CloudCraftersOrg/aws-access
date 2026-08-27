@@ -464,6 +464,92 @@ data "aws_iam_policy_document" "partner_demo_access" {
     resources = ["arn:aws:transform:${var.demo_app_region}:*:profile/*"]
   }
 
+  # Write and Tagging verbs only: the Get*/List* counterparts are already
+  # covered by AWSTransformReadOnly above.
+  #
+  # This does not affect what a user can do *inside* a workspace — that is
+  # governed by AWS Transform workspace roles, which are not IAM.
+  statement {
+    sid    = "AWSTransformAdministration"
+    effect = "Allow"
+    actions = [
+      "transform:AssociateConnectorResource",
+      "transform:CreateProfile",
+      "transform:DeleteConnector",
+      "transform:DeleteProfile",
+      "transform:PutAgentRuntimeConfiguration",
+      "transform:RejectConnector",
+      "transform:TagResource",
+      "transform:UntagResource",
+      "transform:UpdateAccountSettings",
+      "transform:UpdateAgentAccess",
+      "transform:UpdateProfile",
+    ]
+    resources = ["*"]
+  }
+
+  # The console checks account-level public access settings when a connector
+  # request is accepted.
+  statement {
+    sid    = "AWSTransformConnectorPublicAccessCheck"
+    effect = "Allow"
+    actions = [
+      "s3:GetAccountPublicAccessBlock",
+      "s3:GetBucketPublicAccessBlock",
+    ]
+    resources = ["*"]
+  }
+
+  # Accepting a connector request creates a service role for it. Path-scoped to
+  # AWSTransform-*, so this does not widen the fbctf-* IAM scope below.
+  statement {
+    sid    = "AWSTransformConnectorServiceRole"
+    effect = "Allow"
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreateRole",
+      "iam:PassRole",
+    ]
+    resources = ["arn:aws:iam::*:role/service-role/AWSTransform-*"]
+  }
+
+  statement {
+    sid       = "AWSTransformConnectorServicePolicy"
+    effect    = "Allow"
+    actions   = ["iam:CreatePolicy"]
+    resources = ["arn:aws:iam::*:policy/service-role/AWSTransform-*"]
+  }
+
+  # Created on first enable, so the service cannot be turned on without it.
+  statement {
+    sid       = "AWSTransformServiceLinkedRole"
+    effect    = "Allow"
+    actions   = ["iam:CreateServiceLinkedRole"]
+    resources = ["arn:aws:iam::*:role/aws-service-role/transform.amazonaws.com/AWSServiceRoleForAWSTransform"]
+  }
+
+  # Scoped by ViaService rather than by key: the service encrypts with whichever
+  # key the profile is configured with, including a customer managed key.
+  statement {
+    sid    = "AWSTransformKmsViaService"
+    effect = "Allow"
+    actions = [
+      "kms:CreateGrant",
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:GenerateDataKey*",
+      "kms:RetireGrant",
+    ]
+    resources = ["*"]
+
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values   = ["transform.*.amazonaws.com"]
+    }
+  }
+
   # Service-wide allows are acceptable here: the set is region-locked, granted
   # only to the cohort, and the sensitive edges are prefix-scoped below.
   statement {
