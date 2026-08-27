@@ -10,7 +10,7 @@
 #   PowerUserAccess       power_user_access                this file
 #   WorkshopOnlyAccess    infra_modify_only                this file
 #   AWSTransformAccess    partner_demo_access              this file
-#   AiGovernance          ai_governance                    this file
+#   AIGovernance          ai_governance                    this file
 #
 # Read that table rather than trusting the names. They do not line up: the keys
 # here are snake_case while the sets are PascalCase, `PowerUserAccess` is a
@@ -49,7 +49,7 @@ locals {
     power_user_access   = data.aws_iam_policy_document.power_user_access.json   # PowerUserAccess
     infra_modify_only   = data.aws_iam_policy_document.infra_modify_only.json   # WorkshopOnlyAccess
     partner_demo_access = data.aws_iam_policy_document.partner_demo_access.json # AWSTransformAccess
-    ai_governance       = data.aws_iam_policy_document.ai_governance.json       # AiGovernance
+    ai_governance       = data.aws_iam_policy_document.ai_governance.json       # AIGovernance
   }
 }
 
@@ -660,7 +660,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
   }
 }
 
-# Used by: AiGovernance.
+# Used by: AIGovernance.
 #
 # Observes how AI services are used across the account and controls the
 # guardrails that constrain them. Read everywhere, write only on Bedrock
