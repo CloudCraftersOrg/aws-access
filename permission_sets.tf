@@ -18,9 +18,12 @@ resource "aws_ssoadmin_managed_policy_attachment" "this" {
   managed_policy_arn = each.value.managed_policy_arn
 }
 
-# AWS SSO allows one inline policy per permission set, so the region lockdown
-# and the set's own document are merged. compact() drops the placeholder for
-# sets that carry only a managed policy, so those still get the restriction.
+# This is where a permission set and its policy actually meet. AWS SSO allows one
+# inline policy per set, so the region lockdown and the set's own document are
+# merged into a single document. compact() drops the placeholder for sets that
+# carry only a managed policy, so those still get the region restriction.
+#
+# Which document each set resolves to is the table at the top of policies.tf.
 data "aws_iam_policy_document" "permission_set_inline" {
   for_each = var.permission_sets
 
