@@ -53,15 +53,22 @@ variable "permission_sets" {
       inline_policy_key = "partner_demo_access"
       allowed_regions   = ["us-west-2", "us-east-1"]
     }
+    # us-east-1 as well, or an auditor cannot see the Bedrock and AWS Transform
+    # activity that already happens there.
+    AiGovernance = {
+      description       = "Audit AI service usage and manage the Bedrock guardrails constraining it"
+      inline_policy_key = "ai_governance"
+      allowed_regions   = ["us-west-2", "us-east-1"]
+    }
   }
 
   validation {
     condition = alltrue([
       for k, v in var.permission_sets :
-      contains(["power_user_access", "infra_modify_only", "partner_demo_access"], v.inline_policy_key)
+      contains(["power_user_access", "infra_modify_only", "partner_demo_access", "ai_governance"], v.inline_policy_key)
       if v.inline_policy_key != null
     ])
-    error_message = "inline_policy_key must be one of: power_user_access, infra_modify_only, partner_demo_access."
+    error_message = "inline_policy_key must be one of: power_user_access, infra_modify_only, partner_demo_access, ai_governance."
   }
 
   validation {
