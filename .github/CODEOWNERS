@@ -1,0 +1,5 @@
+# Every change here grants or restricts AWS access, so every change needs the
+# same reviewer. Only enforced once a ruleset on main requires Code Owner
+# review — see README.md.
+
+* @santiacmaestre

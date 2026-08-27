@@ -1,0 +1,117 @@
+name: Terraform
+
+# This repo is public, so two things need care:
+#
+#   1. Fork pull requests must not reach AWS. GitHub issues no OIDC token for
+#      them, so the plan job simply fails for forks — that is intended. The
+#      trigger is pull_request, never pull_request_target.
+#   2. Actions logs here are world-readable. Plan output is NOT posted and NOT
+#      echoed; account IDs are wrapped in sensitive() in lookups.tf so they are
+#      redacted even in the raw log. Read the full plan from the artifact, which
+#      is what the summary links to.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_IN_AUTOMATION: 'true'
+
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_wrapper: false
+
+      - name: Format check
+        run: terraform fmt -check -recursive -diff
+
+      - name: Validate
+        run: |
+          terraform init -backend=false -input=false
+          terraform validate -no-color
+
+      # Third-party action. Consider pinning to a commit SHA; tags are mutable.
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.53.0
+
+      - name: TFLint
+        run: tflint --no-color
+
+  terraform:
+    name: Plan and apply
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: us-west-2
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_wrapper: false
+
+      # Only bucket and key are passed here; region and encrypt live in
+      # config.tf. The key must stay under the permissions/ prefix, because the
+      # IAM role's S3 policy is scoped to it.
+      - name: Init
+        run: |
+          terraform init -lock-timeout=5m \
+            -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
+            -backend-config="key=${{ vars.TF_STATE_KEY }}"
+
+      - name: Plan
+        run: terraform plan -no-color -lock-timeout=5m -out=tfplan
+
+      # Counts only. The readable plan goes to the artifact below so nothing
+      # lands in the public log.
+      - name: Summarize
+        run: |
+          terraform show -json tfplan > plan.json
+          add=$(jq '[.resource_changes[]?|select(.change.actions|index("create"))]|length' plan.json)
+          chg=$(jq '[.resource_changes[]?|select(.change.actions|index("update"))]|length' plan.json)
+          del=$(jq '[.resource_changes[]?|select(.change.actions|index("delete"))]|length' plan.json)
+          {
+            echo "### Plan: ${add} to add, ${chg} to change, ${del} to destroy"
+            echo ""
+            echo "Full plan is in the \`plan\` artifact on this run."
+            if [ "${del}" != "0" ]; then
+              echo ""
+              echo ":warning: This plan destroys ${del} resource(s). Destroying a"
+              echo "permission set or an assignment removes access. Review the"
+              echo "artifact before merging."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: plan
+          path: plan.json
+          retention-days: 7
+
+      # Applies the saved plan, so what was reviewed is what runs.
+      - name: Apply
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        run: terraform apply -auto-approve -lock-timeout=5m tfplan
