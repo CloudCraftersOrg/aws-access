@@ -552,6 +552,30 @@ data "aws_iam_policy_document" "partner_demo_access" {
     }
   }
 
+  # AWS Transform Custom (the atx CLI): code transformations and continuous
+  # modernization. No resource-level permissions exist for transform-custom, and
+  # of this set's two regions it is offered only in us-east-1. Runs bill per
+  # agent-minute ($0.035) — hold to `atx --limit` and an account Budgets cap.
+  statement {
+    sid       = "AWSTransformCustomAgent"
+    effect    = "Allow"
+    actions   = ["transform-custom:*"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "AWSTransformCustomServiceLinkedRole"
+    effect    = "Allow"
+    actions   = ["iam:CreateServiceLinkedRole"]
+    resources = ["arn:aws:iam::*:role/aws-service-role/transform-custom.amazonaws.com/AWSServiceRoleForAWSTransformCustom"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:AWSServiceName"
+      values   = ["transform-custom.amazonaws.com"]
+    }
+  }
+
   # Service-wide allows are acceptable here: the set is region-locked, granted
   # only to the cohort, and the sensitive edges are prefix-scoped below.
   statement {
