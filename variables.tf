@@ -55,7 +55,7 @@ variable "permission_sets" {
     }
     # us-east-1 as well, or an auditor cannot see the Bedrock and AWS Transform
     # activity that already happens there.
-    AiGovernance = {
+    AIGovernance = {
       description       = "Audit AI service usage and manage the Bedrock guardrails constraining it"
       inline_policy_key = "ai_governance"
       allowed_regions   = ["us-west-2", "us-east-1"]
