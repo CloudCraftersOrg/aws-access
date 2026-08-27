@@ -16,6 +16,10 @@ variable "region" {
 
 # `name` is immutable in AWS: renaming a key destroys and recreates the
 # permission set and drops every assignment pointing at it.
+#
+# Each set is backed by either managed_policy_arn (an AWS managed policy) or
+# inline_policy_key (a document in policies.tf). The key is not the set's name;
+# policies.tf opens with the full mapping.
 variable "permission_sets" {
   type = map(object({
     description        = string

@@ -15,8 +15,6 @@ Terraform runs. It does commit a few resource *names* the policies grant on — 
 state bucket name and a demo app prefix — which are targets rather than
 credentials. See [Working with names](#working-with-names).
 
----
-
 ## How the two repositories fit together
 
 The foundation lives in a separate private **base repository**: the AWS
@@ -95,8 +93,6 @@ permission to edit.
 
 Open an issue or ask a code owner. It is not possible from here, by design.
 
----
-
 ## What exists today
 
 Five permission sets, all with an 8-hour session:
@@ -139,8 +135,6 @@ Grants are `account name → group display name → permission set names`:
 | | `AWSTransform` | AWSTransform |
 
 Only groups are ever assigned. There are no user-level assignments, by design.
-
----
 
 ## Operations
 
@@ -277,8 +271,6 @@ removing every grant referencing it in the same pull request.
 `PT1H30M`. There is a validation, but it is loose enough that a degenerate value
 like `PT` passes CI and is rejected by AWS at apply. Give it a real duration.
 
----
-
 ## Things that break access
 
 | Action | Effect |
@@ -290,8 +282,6 @@ like `PT` passes CI and is rejected by AWS at apply. Give it a real duration.
 
 The plan summary flags a non-zero destroy count for exactly this reason. Read the
 artifact before approving.
-
----
 
 ## Stages
 
@@ -325,8 +315,6 @@ useful signal. The trigger is `pull_request`, never `pull_request_target`.
 
 The workflow has no path filters, so every pull request runs it. It declares no
 GitHub `environment`, so there is no manual approval gate: merging applies.
-
----
 
 ## Setup
 
@@ -399,8 +387,6 @@ That bucket is shared with the base stack, which keeps its own state under
 different prefixes. Do not point `key` anywhere outside `aws-access/` — the
 role's policy is scoped to that prefix.
 
----
-
 ## Working with names
 
 This repository is public, so what gets committed matters.
@@ -420,8 +406,6 @@ string, so every such name stays visible in one place.
 Every variable runs on its committed default. The workflow sets no `TF_VAR_*` and
 passes no `-var-file`, so `variables.tf` is the whole desired state.
 
----
-
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
@@ -436,8 +420,6 @@ passes no `-var-file`, so `variables.tf` is the whole desired state.
 | Plan wants to replace a permission set | A key in `permission_sets` was renamed | Revert the rename, or accept the access interruption deliberately |
 | A user has no access despite the grant | They are not in the group | Membership lives in the base repository |
 | An allowed action is still refused | Wrong region for that set, or an explicit `Deny` covers it | Check `allowed_regions`, then the `Deny` statements in `policies.tf` |
-
----
 
 ## Reference
 

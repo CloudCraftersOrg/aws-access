@@ -1,24 +1,64 @@
-# Inline policies attached to permission sets, plus the region lockdown that is
-# merged into all of them.
+# IAM policy documents behind the permission sets, plus the region lockdown that
+# is merged into every one of them.
 #
-# To add a document: define it here, register the key below, add the key to the
-# inline_policy_key validation in variables.tf, then reference it from a
-# permission set.
+# WHICH POLICY BACKS WHICH PERMISSION SET
+#
+#   Permission set        Backed by                        Defined in
+#   -------------------   ------------------------------   -------------
+#   AdministratorAccess   AWS managed AdministratorAccess  variables.tf
+#   ReadOnlyAccess        AWS managed ReadOnlyAccess       variables.tf
+#   PowerUserAccess       power_user_access                this file
+#   WorkshopOnlyAccess    infra_modify_only                this file
+#   AWSTransformAccess    partner_demo_access              this file
+#
+# Read that table rather than trusting the names. They do not line up: the keys
+# here are snake_case while the sets are PascalCase, `PowerUserAccess` is a
+# read-only set and is not the AWS managed policy of the same name, and
+# `WorkshopOnlyAccess` is backed by something called `infra_modify_only`.
+#
+# HOW THE LINK IS MADE
+#
+# No resource in this file names a permission set. The connection is assembled
+# across three files, which is why the table above is worth keeping accurate:
+#
+#   1. variables.tf        permission_sets["WorkshopOnlyAccess"]
+#                            .inline_policy_key = "infra_modify_only"
+#
+#   2. policies.tf         local.inline_policies["infra_modify_only"]
+#                            = data.aws_iam_policy_document.infra_modify_only
+#
+#   3. permission_sets.tf  that document, merged with
+#                          region_restriction["WorkshopOnlyAccess"], becomes the
+#                          set's single inline policy
+#
+# The indirection exists so two permission sets can share one document. Nothing
+# does today, so the mapping is 1:1.
+#
+# Every set gets `region_restriction` merged in, including the two that carry an
+# AWS managed policy — so a managed policy is still capped to its set's regions.
+#
+# To add a document: define it here, register it in local.inline_policies below,
+# add its key to the inline_policy_key validation in variables.tf, then set
+# inline_policy_key on a permission set.
 
+# inline_policy_key (as used in variables.tf) => policy JSON.
+# The trailing comment on each line is the permission set that consumes it.
 locals {
   inline_policies = {
-    power_user_access   = data.aws_iam_policy_document.power_user_access.json
-    infra_modify_only   = data.aws_iam_policy_document.infra_modify_only.json
-    partner_demo_access = data.aws_iam_policy_document.partner_demo_access.json
+    power_user_access   = data.aws_iam_policy_document.power_user_access.json   # PowerUserAccess
+    infra_modify_only   = data.aws_iam_policy_document.infra_modify_only.json   # WorkshopOnlyAccess
+    partner_demo_access = data.aws_iam_policy_document.partner_demo_access.json # AWSTransformAccess
   }
 }
 
+# Used by: ALL FIVE permission sets, merged into each one's inline policy.
+#
 # Denies anything outside the set's approved regions. Global and
 # region-agnostic services are exempted via not_actions, otherwise console
 # sign-in, IAM and billing break everywhere.
 #
-# Built per permission set so one set can be widened without opening the extra
-# region for all of them.
+# for_each over var.permission_sets, so there is one document per set and
+# widening one set's allowed_regions does not open that region for the others.
 data "aws_iam_policy_document" "region_restriction" {
   for_each = var.permission_sets
 
@@ -70,7 +110,9 @@ data "aws_iam_policy_document" "region_restriction" {
   }
 }
 
-# Despite the permission set name, this is NOT the AWS managed PowerUserAccess
+# Used by: PowerUserAccess.
+#
+# Despite that permission set name, this is NOT the AWS managed PowerUserAccess
 # policy. It is a read-only observer set. InvokeAgentRuntime is the only
 # non-read action, for running demos from a local machine.
 data "aws_iam_policy_document" "power_user_access" {
@@ -207,8 +249,11 @@ data "aws_iam_policy_document" "power_user_access" {
   }
 }
 
+# Used by: WorkshopOnlyAccess.
+#
 # Read plus update/tag on workshop services, no create or destroy. Enough to
-# run `terraform apply` against resources that already exist.
+# run `terraform apply` against resources that already exist. The explicit
+# DenyCreateAndDestroy statement below beats any Allow added above it.
 data "aws_iam_policy_document" "infra_modify_only" {
   # Wide enough for `terraform plan` to refresh state.
   statement {
@@ -370,6 +415,9 @@ data "aws_iam_policy_document" "infra_modify_only" {
   }
 }
 
+# Used by: AWSTransformAccess, the only set allowed outside var.region
+# (us-west-2 plus us-east-1, because the partner service is us-east-1 only).
+#
 # AWS Transform demo cohort: sign in to the web app, plus deploy the legacy
 # fbctf stack the demo modernizes.
 #
