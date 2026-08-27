@@ -95,7 +95,7 @@ Open an issue or ask a code owner. It is not possible from here, by design.
 
 ## What exists today
 
-Five permission sets, all with an 8-hour session:
+Six permission sets, all with an 8-hour session:
 
 | Permission set | Backed by | Regions |
 |---|---|---|
@@ -104,6 +104,7 @@ Five permission sets, all with an 8-hour session:
 | `PowerUserAccess` | inline `power_user_access` | `us-west-2` |
 | `WorkshopOnlyAccess` | inline `infra_modify_only` | `us-west-2` |
 | `AWSTransformAccess` | inline `partner_demo_access` | `us-west-2`, `us-east-1` |
+| `AiGovernance` | inline `ai_governance` | `us-west-2`, `us-east-1` |
 
 Every set — including the two managed-policy ones — also gets a region lockdown
 merged into its inline policy. Global and region-agnostic services (IAM, STS,
@@ -202,6 +203,7 @@ with a level of access they already have.
    | `PowerUserAccess` | `power_user_access` |
    | `WorkshopOnlyAccess` | `infra_modify_only` |
    | `AWSTransformAccess` | `partner_demo_access` |
+   | `AiGovernance` | `ai_governance` |
 
 2. Add a statement, or actions to an existing one. Keep the narrowest verbs that
    do the job — prefer `sqs:GetQueueAttributes` over `sqs:*`.

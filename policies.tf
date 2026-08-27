@@ -10,6 +10,7 @@
 #   PowerUserAccess       power_user_access                this file
 #   WorkshopOnlyAccess    infra_modify_only                this file
 #   AWSTransformAccess    partner_demo_access              this file
+#   AiGovernance          ai_governance                    this file
 #
 # Read that table rather than trusting the names. They do not line up: the keys
 # here are snake_case while the sets are PascalCase, `PowerUserAccess` is a
@@ -48,10 +49,11 @@ locals {
     power_user_access   = data.aws_iam_policy_document.power_user_access.json   # PowerUserAccess
     infra_modify_only   = data.aws_iam_policy_document.infra_modify_only.json   # WorkshopOnlyAccess
     partner_demo_access = data.aws_iam_policy_document.partner_demo_access.json # AWSTransformAccess
+    ai_governance       = data.aws_iam_policy_document.ai_governance.json       # AiGovernance
   }
 }
 
-# Used by: ALL FIVE permission sets, merged into each one's inline policy.
+# Used by: EVERY permission set, merged into each one's inline policy.
 #
 # Denies anything outside the set's approved regions. Global and
 # region-agnostic services are exempted via not_actions, otherwise console
@@ -655,5 +657,114 @@ data "aws_iam_policy_document" "partner_demo_access" {
       "arn:aws:secretsmanager:*:*:secret:${var.demo_app_prefix}-*",
       "arn:aws:secretsmanager:*:*:secret:rds!*",
     ]
+  }
+}
+
+# Used by: AiGovernance.
+#
+# Observes how AI services are used across the account and controls the
+# guardrails that constrain them. Read everywhere, write only on Bedrock
+# guardrails and model-invocation logging.
+#
+# No bedrock:InvokeModel and no bedrock-agentcore:InvokeAgentRuntime: governing
+# model usage does not require performing it, and leaving invocation out keeps
+# this set's own calls out of the audit trail it reads.
+data "aws_iam_policy_document" "ai_governance" {
+  statement {
+    sid    = "AiServiceReadOnly"
+    effect = "Allow"
+    actions = [
+      "bedrock-agentcore:Get*",
+      "bedrock-agentcore:List*",
+      "bedrock:Get*",
+      "bedrock:List*",
+      "sagemaker:Describe*",
+      "sagemaker:List*",
+    ]
+    resources = ["*"]
+  }
+
+  # ApplyGuardrail is included so a guardrail can be tested against sample input
+  # before it is enforced. It evaluates text against the guardrail and never
+  # reaches a model.
+  statement {
+    sid    = "GuardrailManagement"
+    effect = "Allow"
+    actions = [
+      "bedrock:ApplyGuardrail",
+      "bedrock:CreateGuardrail",
+      "bedrock:CreateGuardrailVersion",
+      "bedrock:DeleteGuardrail",
+      "bedrock:UpdateGuardrail",
+    ]
+    resources = ["*"]
+  }
+
+  # Account-level singleton with no resource form, so it cannot be scoped
+  # further. Turning invocation logging on is what makes model usage auditable
+  # in the first place.
+  statement {
+    sid    = "ModelInvocationLogging"
+    effect = "Allow"
+    actions = [
+      "bedrock:DeleteModelInvocationLoggingConfiguration",
+      "bedrock:PutModelInvocationLoggingConfiguration",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AuditTrailReadOnly"
+    effect = "Allow"
+    actions = [
+      "cloudtrail:Describe*",
+      "cloudtrail:Get*",
+      "cloudtrail:List*",
+      "cloudtrail:LookupEvents",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "ObservabilityReadOnly"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:Describe*",
+      "cloudwatch:Get*",
+      "cloudwatch:List*",
+      "logs:Describe*",
+      "logs:FilterLogEvents",
+      "logs:Get*",
+      "logs:List*",
+      "logs:StartQuery",
+      "logs:StopQuery",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "ConfigReadOnly"
+    effect = "Allow"
+    actions = [
+      "config:Describe*",
+      "config:Get*",
+      "config:List*",
+      "config:SelectResourceConfig",
+    ]
+    resources = ["*"]
+  }
+
+  # Simulate* answers "who could invoke a model" without granting any change to
+  # the policies it evaluates.
+  statement {
+    sid    = "IamReadOnly"
+    effect = "Allow"
+    actions = [
+      "iam:Get*",
+      "iam:List*",
+      "iam:SimulateCustomPolicy",
+      "iam:SimulatePrincipalPolicy",
+    ]
+    resources = ["*"]
   }
 }
