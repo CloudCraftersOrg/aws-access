@@ -2,8 +2,12 @@
 # than committed. That is the whole reason this repository can be public.
 #
 # Accounts are matched on NAME and groups on DISPLAY NAME, so renaming either
-# one in the base repo breaks grants here. Both are validated below with a
-# check block so the failure is a readable message instead of an index error.
+# one in the base repo breaks grants here.
+#
+# The check blocks below add a readable explanation, but they only ever emit
+# warnings: a missing account still fails the run on the index into
+# local.account_ids, and a missing group fails on the data source lookup. Read
+# the warning for the cause, not the error.
 
 data "aws_ssoadmin_instances" "this" {}
 
@@ -18,9 +22,9 @@ locals {
   # the organization and would otherwise have to be committed here, so it is
   # resolved from the API instead.
   #
-  # Left unmarked so keys() and the check block below operate on plain values;
-  # sensitive() is applied at the point of use in assignments.tf, which is what
-  # keeps the IDs out of plan output.
+  # These IDs are not marked sensitive, so they appear in full in plan output.
+  # Keeping the plan out of the public Actions log is what protects them: see
+  # the Summarize step in deploy.yaml.
   account_ids = merge(
     {
       for account in data.aws_organizations_organization.this.accounts :
@@ -46,6 +50,8 @@ check "sso_instance_exists" {
   }
 }
 
+# Only accounts are checked. A missing group surfaces as a data source error on
+# aws_identitystore_group below, which already names the group it could not find.
 check "granted_accounts_exist" {
   assert {
     condition = alltrue([

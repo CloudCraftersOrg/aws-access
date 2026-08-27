@@ -379,8 +379,7 @@ data "aws_iam_policy_document" "infra_modify_only" {
 # role, not the user's session.
 #
 # The Fbctf* statements exist for the cohort's own `terraform apply`, not for
-# anything AWS Transform does. SIDs match what is deployed — renaming one
-# rewrites the live policy, so treat them as fixed.
+# anything AWS Transform does.
 data "aws_iam_policy_document" "partner_demo_access" {
   # Without this the console header cannot render the signed-in account.
   statement {

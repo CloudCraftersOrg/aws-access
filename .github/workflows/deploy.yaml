@@ -5,10 +5,11 @@ name: Terraform
 #   1. Fork pull requests must not reach AWS. GitHub issues no OIDC token for
 #      them, so the plan job simply fails for forks — that is intended. The
 #      trigger is pull_request, never pull_request_target.
-#   2. Actions logs here are world-readable. Plan output is NOT posted and NOT
-#      echoed; account IDs are wrapped in sensitive() in lookups.tf so they are
-#      redacted even in the raw log. Read the full plan from the artifact, which
-#      is what the summary links to.
+#   2. Actions logs here are world-readable, and plan output resolves real
+#      account IDs and ARNs. Nothing marks them sensitive, so the protection is
+#      procedural: the plan is never echoed and never posted as a comment. Only
+#      add/change/destroy counts go to the job summary. The full plan is a
+#      run artifact, which is readable by anyone who can read the repo.
 
 on:
   pull_request:
@@ -48,7 +49,7 @@ jobs:
           terraform validate -no-color
 
       # Third-party action. Consider pinning to a commit SHA; tags are mutable.
-      - uses: terraform-linters/setup-tflint@v4
+      - uses: terraform-linters/setup-tflint@v6
         with:
           tflint_version: v0.53.0
 
@@ -73,8 +74,8 @@ jobs:
           terraform_wrapper: false
 
       # Only bucket and key are passed here; region and encrypt live in
-      # config.tf. The key must stay under the permissions/ prefix, because the
-      # IAM role's S3 policy is scoped to it.
+      # config.tf. The key must stay under the aws-access/ prefix, because the
+      # IAM role's S3 policy is scoped to a prefix named after this repo.
       - name: Init
         run: |
           terraform init -lock-timeout=5m \
@@ -84,8 +85,9 @@ jobs:
       - name: Plan
         run: terraform plan -no-color -lock-timeout=5m -out=tfplan
 
-      # Counts only. The readable plan goes to the artifact below so nothing
-      # lands in the public log.
+      # Counts only, so nothing resolved lands in the public log. plan.json is
+      # the machine-readable form from `terraform show -json`, not rendered plan
+      # text; the binary tfplan is not uploaded, so it cannot be re-rendered.
       - name: Summarize
         run: |
           terraform show -json tfplan > plan.json
@@ -105,13 +107,15 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload plan
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: plan
           path: plan.json
           retention-days: 7
 
-      # Applies the saved plan, so what was reviewed is what runs.
+      # Applies the plan saved earlier in THIS run. The pull request's plan does
+      # not carry over — the post-merge run plans again from scratch, so the PR
+      # plan is a preview, not the artifact that gets applied.
       - name: Apply
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: terraform apply -auto-approve -lock-timeout=5m tfplan
