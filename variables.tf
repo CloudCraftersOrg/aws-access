@@ -1,6 +1,8 @@
-# Nothing here is secret, and nothing here is environment-specific except the
-# two values at the bottom, which come from GitHub repo variables via TF_VAR_
-# rather than being committed.
+# Nothing here is secret. Every variable runs on its committed default; the
+# workflow sets no TF_VAR_* and passes no -var-file.
+#
+# The resource names at the bottom are the exception to "no names in a public
+# repo": they are targets the policies grant on, not credentials.
 
 variable "region" {
   type        = string
@@ -75,9 +77,8 @@ variable "permission_sets" {
 #
 # Account keys are literal AWS account names, except `management`, which is a
 # reserved alias for the organization's management account. Group keys are
-# Identity Center display names. Both must match what the base repo created;
-# lookups.tf verifies the accounts and fails the plan with a readable message
-# otherwise.
+# Identity Center display names. Both must match what the base repo created, or
+# the run fails during lookup; see the check blocks in lookups.tf.
 variable "grants" {
   type        = map(map(list(string)))
   description = "AWS account name -> Identity Center group display name -> permission set names."
