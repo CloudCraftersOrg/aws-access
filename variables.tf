@@ -122,6 +122,7 @@ variable "grants" {
       Administrators = ["AdministratorAccess", "PowerUserAccess", "ReadOnlyAccess", "AWSTransformAccess"]
       Workshops      = ["PowerUserAccess"]
       AWSTransform   = ["AWSTransformAccess"]
+      AIGovernance   = ["AIGovernance"]
     }
   }
 
