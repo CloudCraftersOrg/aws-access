@@ -1040,31 +1040,90 @@ data "aws_iam_policy_document" "partner_demo_access" {
 
 # Used by: AIGovernance.
 #
-# Observes how AI services are used across the account and controls the
-# guardrails that constrain them. Read everywhere, write only on Bedrock
-# guardrails and model-invocation logging.
+# The AI governance operator: inventory every AI service in the account,
+# enforce the controls that constrain them, and produce the audit evidence.
+# Read is account-wide; write is limited to the controls (guardrails, invocation
+# logging, Config rules, Audit Manager) and to resources named AIGovernance-*.
 #
 # No bedrock:InvokeModel and no bedrock-agentcore:InvokeAgentRuntime: governing
 # model usage does not require performing it, and leaving invocation out keeps
 # this set's own calls out of the audit trail it reads.
 data "aws_iam_policy_document" "ai_governance" {
   statement {
-    sid    = "AiServiceReadOnly"
+    sid    = "AiServiceInventoryReadOnly"
     effect = "Allow"
     actions = [
       "bedrock-agentcore:Get*",
       "bedrock-agentcore:List*",
       "bedrock:Get*",
       "bedrock:List*",
+      "comprehend:Describe*",
+      "comprehend:List*",
+      "comprehendmedical:Describe*",
+      "comprehendmedical:List*",
+      "forecast:Describe*",
+      "forecast:List*",
+      "frauddetector:BatchGet*",
+      "frauddetector:Describe*",
+      "frauddetector:Get*",
+      "kendra:Describe*",
+      "kendra:List*",
+      "lex:Describe*",
+      "lex:List*",
+      "lexv2-models:Describe*",
+      "lexv2-models:List*",
+      "lookoutequipment:Describe*",
+      "lookoutequipment:List*",
+      "lookoutmetrics:Describe*",
+      "lookoutmetrics:Get*",
+      "lookoutmetrics:List*",
+      "lookoutvision:Describe*",
+      "lookoutvision:List*",
+      "personalize:Describe*",
+      "personalize:List*",
+      "polly:Describe*",
+      "polly:List*",
+      "qapps:Get*",
+      "qapps:List*",
+      "qbusiness:Get*",
+      "qbusiness:List*",
+      "rekognition:Describe*",
+      "rekognition:List*",
       "sagemaker:Describe*",
       "sagemaker:List*",
+      "transcribe:Get*",
+      "transcribe:List*",
+      "translate:Describe*",
+      "translate:Get*",
+      "translate:List*",
     ]
     resources = ["*"]
   }
 
-  # ApplyGuardrail is included so a guardrail can be tested against sample input
-  # before it is enforced. It evaluates text against the guardrail and never
-  # reaches a model.
+  # No InvokeModel here either. The wider AI services carry their own
+  # inference verbs (comprehend:DetectSentiment, rekognition:DetectLabels, ...)
+  # which are deliberately excluded: this set inventories and governs, it
+  # never runs a model.
+
+  # Cross-service resource discovery so the inventory above can be reconciled
+  # against what is actually tagged and deployed.
+  statement {
+    sid    = "ResourceInventoryReadOnly"
+    effect = "Allow"
+    actions = [
+      "resource-explorer-2:BatchGetView",
+      "resource-explorer-2:Get*",
+      "resource-explorer-2:List*",
+      "resource-explorer-2:Search",
+      "tag:Describe*",
+      "tag:Get*",
+    ]
+    resources = ["*"]
+  }
+
+  # ApplyGuardrail evaluates sample text against a guardrail before it is
+  # enforced and never reaches a model. TagResource lets the operator label
+  # the guardrails it creates for lifecycle and ownership.
   statement {
     sid    = "GuardrailManagement"
     effect = "Allow"
@@ -1073,16 +1132,18 @@ data "aws_iam_policy_document" "ai_governance" {
       "bedrock:CreateGuardrail",
       "bedrock:CreateGuardrailVersion",
       "bedrock:DeleteGuardrail",
+      "bedrock:TagResource",
+      "bedrock:UntagResource",
       "bedrock:UpdateGuardrail",
     ]
     resources = ["*"]
   }
 
-  # Account-level singleton with no resource form, so it cannot be scoped
-  # further. Turning invocation logging on is what makes model usage auditable
-  # in the first place.
+  # Turning model-invocation logging on is what makes usage auditable at all.
+  # The Put call validates its destination, so the operator also needs to build
+  # that destination: the delivery role, the log group, and the S3 bucket.
   statement {
-    sid    = "ModelInvocationLogging"
+    sid    = "ModelInvocationLoggingControl"
     effect = "Allow"
     actions = [
       "bedrock:DeleteModelInvocationLoggingConfiguration",
@@ -1092,13 +1153,202 @@ data "aws_iam_policy_document" "ai_governance" {
   }
 
   statement {
+    sid    = "InvocationLoggingLogGroup"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:DeleteLogGroup",
+      "logs:PutRetentionPolicy",
+      "logs:PutResourcePolicy",
+      "logs:TagLogGroup",
+      "logs:TagResource",
+      "logs:UntagLogGroup",
+      "logs:UntagResource",
+    ]
+    resources = [
+      "arn:aws:logs:*:*:log-group:/aws/bedrock/*",
+      "arn:aws:logs:*:*:log-group:/aws/vendedlogs/bedrock/*",
+      "arn:aws:logs:*:*:log-group:/aigov/*",
+    ]
+  }
+
+  # The bucket that receives invocation logs and Audit Manager evidence.
+  # Name-scoped to aigov-*, so this cannot touch any other bucket.
+  statement {
+    sid     = "GovernanceBucket"
+    effect  = "Allow"
+    actions = ["s3:*"]
+    resources = [
+      "arn:aws:s3:::aigov-*",
+      "arn:aws:s3:::aigov-*/*",
+    ]
+  }
+
+  # Read-only visibility of every other bucket's posture, plus the ability to
+  # read objects out of the invocation-log and knowledge-base buckets.
+  statement {
+    sid    = "EvidenceReadOnly"
+    effect = "Allow"
+    actions = [
+      "s3:GetAccountPublicAccessBlock",
+      "s3:GetBucketAcl",
+      "s3:GetBucketLocation",
+      "s3:GetBucketLogging",
+      "s3:GetBucketNotification",
+      "s3:GetBucketObjectLockConfiguration",
+      "s3:GetBucketOwnershipControls",
+      "s3:GetBucketPolicy",
+      "s3:GetBucketPolicyStatus",
+      "s3:GetBucketPublicAccessBlock",
+      "s3:GetBucketTagging",
+      "s3:GetBucketVersioning",
+      "s3:GetEncryptionConfiguration",
+      "s3:GetLifecycleConfiguration",
+      "s3:ListAllMyBuckets",
+      "s3:ListBucket",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "InvocationLogObjectReadOnly"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+    resources = [
+      "arn:aws:s3:::*bedrock-logs*/*",
+      "arn:aws:s3:::*model-invocation-logs*/*",
+      "arn:aws:s3:::*knowledge-base*/*",
+    ]
+  }
+
+  # Delivery / remediation roles the operator creates for the controls above.
+  # Path-scoped to AIGovernance-*, the same pattern AWSTransformAccess uses.
+  statement {
+    sid    = "GovernanceServiceRoles"
+    effect = "Allow"
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:PutRolePolicy",
+      "iam:TagRole",
+      "iam:UntagRole",
+      "iam:UpdateAssumeRolePolicy",
+      "iam:UpdateRoleDescription",
+    ]
+    resources = ["arn:aws:iam::*:role/AIGovernance-*"]
+  }
+
+  statement {
+    sid       = "GovernancePassRole"
+    effect    = "Allow"
+    actions   = ["iam:PassRole"]
+    resources = ["arn:aws:iam::*:role/AIGovernance-*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values = [
+        "bedrock.amazonaws.com",
+        "config.amazonaws.com",
+        "ssm.amazonaws.com",
+      ]
+    }
+  }
+
+  statement {
+    sid       = "GovernanceServiceLinkedRoles"
+    effect    = "Allow"
+    actions   = ["iam:CreateServiceLinkedRole"]
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:AWSServiceName"
+      values = [
+        "auditmanager.amazonaws.com",
+        "config.amazonaws.com",
+      ]
+    }
+  }
+
+  # Deploy and remediate the AI posture rules (guardrail-attached,
+  # sagemaker-notebook-no-direct-internet, and so on). ConfigRule ARNs are
+  # generated, so this cannot be name-scoped.
+  statement {
+    sid    = "ConfigRuleEnforcement"
+    effect = "Allow"
+    actions = [
+      "config:DeleteConfigRule",
+      "config:DeleteConformancePack",
+      "config:DeleteRemediationConfiguration",
+      "config:DeleteRemediationExceptions",
+      "config:PutConfigRule",
+      "config:PutConformancePack",
+      "config:PutRemediationConfigurations",
+      "config:PutRemediationExceptions",
+      "config:PutRetentionConfiguration",
+      "config:StartConfigRulesEvaluation",
+      "config:StartRemediationExecution",
+      "config:TagResource",
+      "config:UntagResource",
+    ]
+    resources = ["*"]
+  }
+
+  # AWS Audit Manager, including its Generative AI Best Practices framework:
+  # register the account, run assessments, and export evidence reports.
+  statement {
+    sid    = "AuditManager"
+    effect = "Allow"
+    actions = [
+      "auditmanager:AssociateAssessmentReportEvidenceFolder",
+      "auditmanager:BatchAssociateAssessmentReportEvidence",
+      "auditmanager:BatchDisassociateAssessmentReportEvidence",
+      "auditmanager:BatchGet*",
+      "auditmanager:CreateAssessment",
+      "auditmanager:CreateAssessmentFramework",
+      "auditmanager:CreateAssessmentReport",
+      "auditmanager:CreateControl",
+      "auditmanager:DeleteAssessment",
+      "auditmanager:DeleteAssessmentFramework",
+      "auditmanager:DeleteAssessmentReport",
+      "auditmanager:DeleteControl",
+      "auditmanager:DeregisterAccount",
+      "auditmanager:DisassociateAssessmentReportEvidenceFolder",
+      "auditmanager:Get*",
+      "auditmanager:List*",
+      "auditmanager:RegisterAccount",
+      "auditmanager:StartAssessmentReportEvidenceSelection",
+      "auditmanager:TagResource",
+      "auditmanager:UntagResource",
+      "auditmanager:UpdateAssessment",
+      "auditmanager:UpdateAssessmentControl",
+      "auditmanager:UpdateAssessmentControlSetStatus",
+      "auditmanager:UpdateAssessmentFramework",
+      "auditmanager:UpdateAssessmentStatus",
+      "auditmanager:UpdateControl",
+      "auditmanager:UpdateSettings",
+      "auditmanager:ValidateAssessmentReportIntegrity",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
     sid    = "AuditTrailReadOnly"
     effect = "Allow"
     actions = [
+      "cloudtrail:CancelQuery",
       "cloudtrail:Describe*",
       "cloudtrail:Get*",
       "cloudtrail:List*",
       "cloudtrail:LookupEvents",
+      "cloudtrail:StartQuery",
     ]
     resources = ["*"]
   }
@@ -1114,7 +1364,9 @@ data "aws_iam_policy_document" "ai_governance" {
       "logs:FilterLogEvents",
       "logs:Get*",
       "logs:List*",
+      "logs:StartLiveTail",
       "logs:StartQuery",
+      "logs:StopLiveTail",
       "logs:StopQuery",
     ]
     resources = ["*"]
@@ -1124,25 +1376,108 @@ data "aws_iam_policy_document" "ai_governance" {
     sid    = "ConfigReadOnly"
     effect = "Allow"
     actions = [
+      "config:BatchGet*",
       "config:Describe*",
       "config:Get*",
       "config:List*",
+      "config:SelectAggregateResourceConfig",
       "config:SelectResourceConfig",
     ]
     resources = ["*"]
   }
 
-  # Simulate* answers "who could invoke a model" without granting any change to
-  # the policies it evaluates.
+  # Security Hub and IAM Access Analyzer: the two native posture surfaces for
+  # AI resources (control failures, externally shared models, over-broad
+  # invoke permissions). Read plus policy-checking, no finding suppression.
+  statement {
+    sid    = "SecurityPostureReadOnly"
+    effect = "Allow"
+    actions = [
+      "access-analyzer:CheckAccessNotGranted",
+      "access-analyzer:CheckNoNewAccess",
+      "access-analyzer:CheckNoPublicAccess",
+      "access-analyzer:Get*",
+      "access-analyzer:List*",
+      "access-analyzer:ValidatePolicy",
+      "securityhub:BatchGet*",
+      "securityhub:Describe*",
+      "securityhub:Get*",
+      "securityhub:List*",
+    ]
+    resources = ["*"]
+  }
+
+  # Cost visibility for AI spend attribution (which team spends what on
+  # invocation). ce:* is global and already exempt from the region lockdown.
+  statement {
+    sid    = "AiCostVisibility"
+    effect = "Allow"
+    actions = [
+      "bcm-data-exports:Get*",
+      "bcm-data-exports:List*",
+      "ce:Describe*",
+      "ce:Get*",
+      "ce:List*",
+      "cur:Describe*",
+      "cur:Get*",
+    ]
+    resources = ["*"]
+  }
+
+  # Simulate* answers "who could invoke a model"; GenerateServiceLastAccessed
+  # answers "who actually did". Neither changes the policies it evaluates.
   statement {
     sid    = "IamReadOnly"
     effect = "Allow"
     actions = [
+      "iam:GenerateCredentialReport",
+      "iam:GenerateServiceLastAccessedDetails",
       "iam:Get*",
       "iam:List*",
       "iam:SimulateCustomPolicy",
       "iam:SimulatePrincipalPolicy",
     ]
     resources = ["*"]
+  }
+
+  # Read every key's posture; use only the keys the AI services and the
+  # governance bucket encrypt with, scoped by ViaService.
+  statement {
+    sid    = "KmsPostureReadOnly"
+    effect = "Allow"
+    actions = [
+      "kms:DescribeKey",
+      "kms:GetKeyPolicy",
+      "kms:GetKeyRotationStatus",
+      "kms:ListAliases",
+      "kms:ListGrants",
+      "kms:ListKeys",
+      "kms:ListResourceTags",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "KmsViaGovernedServices"
+    effect = "Allow"
+    actions = [
+      "kms:CreateGrant",
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey*",
+      "kms:RetireGrant",
+    ]
+    resources = ["*"]
+
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values = [
+        "auditmanager.*.amazonaws.com",
+        "bedrock.*.amazonaws.com",
+        "logs.*.amazonaws.com",
+        "s3.*.amazonaws.com",
+      ]
+    }
   }
 }
