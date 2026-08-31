@@ -1040,14 +1040,16 @@ data "aws_iam_policy_document" "partner_demo_access" {
 
 # Used by: AIGovernance.
 #
-# The AI governance operator: inventory every AI service in the account,
-# enforce the controls that constrain them, and produce the audit evidence.
-# Read is account-wide; write is limited to the controls (guardrails, invocation
-# logging, Config rules, Audit Manager) and to resources named AIGovernance-*.
+# The AI governance operator: inventory every AI service, invoke and evaluate
+# Bedrock models to validate the controls, enforce those controls at account and
+# organization level (guardrails, invocation logging, Config rules, SCPs, Audit
+# Manager), and produce the audit evidence. Read is account-wide; provisioning
+# write is confined to the controls and to AIGovernance-* / aigov-* resources.
 #
-# No bedrock:InvokeModel and no bedrock-agentcore:InvokeAgentRuntime: governing
-# model usage does not require performing it, and leaving invocation out keeps
-# this set's own calls out of the audit trail it reads.
+# organizations:* write only functions from the management or a delegated-admin
+# account - see the AIGovernance grant. bedrock:InvokeModel is granted (the wider
+# AI services' inference verbs are not): the operator runs Bedrock to red-team
+# its own guardrails, accepting that those calls land in the trail it audits.
 data "aws_iam_policy_document" "ai_governance" {
   statement {
     sid    = "AiServiceInventoryReadOnly"
@@ -1100,10 +1102,29 @@ data "aws_iam_policy_document" "ai_governance" {
     resources = ["*"]
   }
 
-  # No InvokeModel here either. The wider AI services carry their own
-  # inference verbs (comprehend:DetectSentiment, rekognition:DetectLabels, ...)
-  # which are deliberately excluded: this set inventories and governs, it
-  # never runs a model.
+  # Invoke Bedrock to test guardrails end to end and run evaluation / batch
+  # jobs for automated governance checks. The wider AI services' own inference
+  # verbs (comprehend:DetectSentiment, rekognition:DetectLabels, ...) stay out.
+  statement {
+    sid    = "BedrockInvokeAndEvaluate"
+    effect = "Allow"
+    actions = [
+      "bedrock-agentcore:InvokeAgentRuntime",
+      "bedrock:Converse",
+      "bedrock:ConverseStream",
+      "bedrock:CreateEvaluationJob",
+      "bedrock:CreateModelInvocationJob",
+      "bedrock:InvokeAgent",
+      "bedrock:InvokeFlow",
+      "bedrock:InvokeModel",
+      "bedrock:InvokeModelWithResponseStream",
+      "bedrock:Retrieve",
+      "bedrock:RetrieveAndGenerate",
+      "bedrock:StopEvaluationJob",
+      "bedrock:StopModelInvocationJob",
+    ]
+    resources = ["*"]
+  }
 
   # Cross-service resource discovery so the inventory above can be reconciled
   # against what is actually tagged and deployed.
@@ -1278,7 +1299,8 @@ data "aws_iam_policy_document" "ai_governance" {
   }
 
   # Deploy and remediate the AI posture rules (guardrail-attached,
-  # sagemaker-notebook-no-direct-internet, and so on). ConfigRule ARNs are
+  # sagemaker-notebook-no-direct-internet, and so on), per account and, where
+  # this account is a delegated admin for Config, org-wide. ConfigRule ARNs are
   # generated, so this cannot be name-scoped.
   statement {
     sid    = "ConfigRuleEnforcement"
@@ -1286,10 +1308,16 @@ data "aws_iam_policy_document" "ai_governance" {
     actions = [
       "config:DeleteConfigRule",
       "config:DeleteConformancePack",
+      "config:DeleteOrganizationConfigRule",
+      "config:DeleteOrganizationConformancePack",
       "config:DeleteRemediationConfiguration",
       "config:DeleteRemediationExceptions",
+      "config:GetOrganizationConfigRuleDetailedStatus",
+      "config:GetOrganizationConformancePackDetailedStatus",
       "config:PutConfigRule",
       "config:PutConformancePack",
+      "config:PutOrganizationConfigRule",
+      "config:PutOrganizationConformancePack",
       "config:PutRemediationConfigurations",
       "config:PutRemediationExceptions",
       "config:PutRetentionConfiguration",
@@ -1297,6 +1325,19 @@ data "aws_iam_policy_document" "ai_governance" {
       "config:StartRemediationExecution",
       "config:TagResource",
       "config:UntagResource",
+    ]
+    resources = ["*"]
+  }
+
+  # Read-only view of the org (accounts, OUs, policies, delegated admins) to
+  # scope governance. Returns data only from the management or a delegated-admin
+  # account; SCP authoring and delegated-admin registration stay in cloudlab.
+  statement {
+    sid    = "OrganizationsReadOnly"
+    effect = "Allow"
+    actions = [
+      "organizations:Describe*",
+      "organizations:List*",
     ]
     resources = ["*"]
   }
