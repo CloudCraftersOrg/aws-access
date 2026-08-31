@@ -48,6 +48,11 @@ variable "permission_sets" {
       description       = "Modify existing workshop infra (no create/destroy) plus invoke AgentCore runtime"
       inline_policy_key = "infra_modify_only"
     }
+    DevOpsAgentAccess = {
+      description       = "Diagnose common AWS infrastructure and deploy the helper resources used by AWS DevOps Agent demos"
+      inline_policy_key = "devops_agent_access"
+      allowed_regions   = ["us-east-1", "us-west-2"]
+    }
     AWSTransformAccess = {
       description       = "AWS Transform demo cohort: web app sign-in plus deploying the fbctf demo app"
       inline_policy_key = "partner_demo_access"
@@ -65,10 +70,10 @@ variable "permission_sets" {
   validation {
     condition = alltrue([
       for k, v in var.permission_sets :
-      contains(["power_user_access", "infra_modify_only", "partner_demo_access", "ai_governance"], v.inline_policy_key)
+      contains(["power_user_access", "infra_modify_only", "devops_agent_access", "partner_demo_access", "ai_governance"], v.inline_policy_key)
       if v.inline_policy_key != null
     ])
-    error_message = "inline_policy_key must be one of: power_user_access, infra_modify_only, partner_demo_access, ai_governance."
+    error_message = "inline_policy_key must be one of: power_user_access, infra_modify_only, devops_agent_access, partner_demo_access, ai_governance."
   }
 
   validation {
@@ -121,6 +126,7 @@ variable "grants" {
     Sandbox = {
       Administrators = ["AdministratorAccess", "PowerUserAccess", "ReadOnlyAccess", "AWSTransformAccess"]
       Workshops      = ["PowerUserAccess"]
+      DevOpsAgent    = ["DevOpsAgentAccess"]
       AWSTransform   = ["AWSTransformAccess"]
       AIGovernance   = ["AIGovernance"]
     }
