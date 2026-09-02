@@ -1019,6 +1019,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
       test     = "StringEquals"
       variable = "iam:AWSServiceName"
       values = [
+        "drs.amazonaws.com",
         "mgn.amazonaws.com",
         "autoscaling.amazonaws.com",
         "elasticache.amazonaws.com",
@@ -1088,6 +1089,28 @@ data "aws_iam_policy_document" "partner_demo_access" {
       "mgn:ListTagsForResource",
     ]
     resources = ["*"]
+  }
+
+  # mgn:InitializeService creates the AWSApplicationMigration* roles and their
+  # instance profiles on first use. Scoped by name, like AWSTransformConnectorServiceRole.
+  statement {
+    sid    = "MgnBootstrapRoles"
+    effect = "Allow"
+    actions = [
+      "iam:AddRoleToInstanceProfile",
+      "iam:AttachRolePolicy",
+      "iam:CreateInstanceProfile",
+      "iam:CreateRole",
+      "iam:PassRole",
+      "iam:PutRolePolicy",
+      "iam:TagInstanceProfile",
+      "iam:TagRole",
+    ]
+    resources = [
+      "arn:aws:iam::*:instance-profile/AWSApplicationMigration*",
+      "arn:aws:iam::*:role/AWSApplicationMigration*",
+      "arn:aws:iam::*:role/service-role/AWSApplicationMigration*",
+    ]
   }
 
   statement {
