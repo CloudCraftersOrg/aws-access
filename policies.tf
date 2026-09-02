@@ -1019,6 +1019,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
       test     = "StringEquals"
       variable = "iam:AWSServiceName"
       values = [
+        "bedrock-agentcore.amazonaws.com",
         "drs.amazonaws.com",
         "mgn.amazonaws.com",
         "autoscaling.amazonaws.com",
@@ -1158,7 +1159,9 @@ data "aws_iam_policy_document" "partner_demo_access" {
       "lambda:DeleteFunction",
       "lambda:GetAlias",
       "lambda:GetFunction",
+      "lambda:GetFunctionCodeSigningConfig",
       "lambda:GetFunctionConfiguration",
+      "lambda:GetFunctionEventInvokeConfig",
       "lambda:GetPolicy",
       "lambda:InvokeFunction",
       "lambda:ListTags",
@@ -1266,6 +1269,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
       "budgets:CreateBudget",
       "budgets:DeleteBudget",
       "budgets:DescribeBudget",
+      "budgets:ListTagsForResource",
       "budgets:ModifyBudget",
       "budgets:ViewBudget",
     ]
