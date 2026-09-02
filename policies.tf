@@ -1527,12 +1527,7 @@ data "aws_iam_policy_document" "ai_governance" {
 }
 
 # Used by: TransformAgentsAccess. Allowed in us-west-2 and us-east-1.
-#
-# Multi-agent migration PoC on top of AWS Transform: invoke Bedrock models,
-# screen them with a Guardrail, and run its own DynamoDB / Lambda / ECR /
-# AgentCore / Scheduler / S3 / Budgets stack. Reads are account-wide for
-# `terraform plan`; writes are scoped to transform_agents_prefix-*. Wave and
-# DNS mutations run under the step-dispatcher Lambda's role, not here.
+
 data "aws_iam_policy_document" "transform_agents_access" {
   statement {
     sid       = "ConsoleBaseline"

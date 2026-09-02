@@ -68,8 +68,6 @@ variable "permission_sets" {
         "us-east-1", "us-east-2", "us-west-1", "us-west-2",
       ]
     }
-    # Multi-agent migration PoC on AWS Transform. Its stack is name-scoped to
-    # transform-agents-*; see transform_agents_access in policies.tf.
     TransformAgentsAccess = {
       description       = "Multi-agent migration PoC: Bedrock invoke plus its own DynamoDB/Lambda/AgentCore stack, scoped to transform-agents-*"
       inline_policy_key = "transform_agents_access"
