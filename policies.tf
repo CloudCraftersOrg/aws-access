@@ -1019,7 +1019,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
       test     = "StringEquals"
       variable = "iam:AWSServiceName"
       values = [
-        "application-migration.amazonaws.com",
+        "mgn.amazonaws.com",
         "autoscaling.amazonaws.com",
         "elasticache.amazonaws.com",
         "elasticloadbalancing.amazonaws.com",
