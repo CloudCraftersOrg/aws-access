@@ -1019,13 +1019,18 @@ data "aws_iam_policy_document" "partner_demo_access" {
   }
 
   # CloudFormation applies the template with the caller's permissions, and this
-  # stack exists only to create a role, so CreateStack above accomplishes nothing
-  # without this.
+  # stack exists only to create a role and its policies, so CreateStack above
+  # accomplishes nothing without the two statements here.
   #
   # AWSTransform* deliberately, not the AWSTransform-* used by
   # AWSTransformConnectorServiceRole further up: the stack's role is named
-  # AWSTransformCodeBuildExecutionRole, with no hyphen, so it falls outside that
-  # scope. Both role paths are listed because the template chooses the path.
+  # AWSTransformCodeBuildExecutionRole-<region>, with no hyphen after
+  # AWSTransform, so it falls outside that scope. Both role paths are listed
+  # because the template chooses the path.
+  #
+  # UpdateAssumeRolePolicy and UpdateRole are for redeploys: the template pins
+  # the trust policy to an account and a CodeBuild project ARN, so a stack update
+  # rewrites it rather than replacing the role.
   statement {
     sid    = "AWSTransformCodeBuildExecutionRole"
     effect = "Allow"
@@ -1039,11 +1044,36 @@ data "aws_iam_policy_document" "partner_demo_access" {
       "iam:PutRolePolicy",
       "iam:TagRole",
       "iam:UntagRole",
+      "iam:UpdateAssumeRolePolicy",
+      "iam:UpdateRole",
     ]
     resources = [
       "arn:aws:iam::*:role/AWSTransform*",
       "arn:aws:iam::*:role/service-role/AWSTransform*",
     ]
+  }
+
+  # The same stack creates six customer managed policies and attaches them to the
+  # role above: AWSTransformBasePolicy-<region> plus the Networking, Storage, KMS,
+  # ECS and EKS ones. None of them sit under a service-role/ path, so
+  # AWSTransformConnectorServicePolicy further up does not reach them.
+  #
+  # CreatePolicyVersion and SetDefaultPolicyVersion are the redeploy path: a
+  # changed policy body becomes a new default version rather than a new policy.
+  # Get*/List* are already granted account-wide by FbctfIamRead.
+  statement {
+    sid    = "AWSTransformCodeBuildPolicies"
+    effect = "Allow"
+    actions = [
+      "iam:CreatePolicy",
+      "iam:CreatePolicyVersion",
+      "iam:DeletePolicy",
+      "iam:DeletePolicyVersion",
+      "iam:SetDefaultPolicyVersion",
+      "iam:TagPolicy",
+      "iam:UntagPolicy",
+    ]
+    resources = ["arn:aws:iam::*:policy/AWSTransform*"]
   }
 
   # Service-wide allows are acceptable here: the set is region-locked, granted
