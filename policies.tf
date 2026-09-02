@@ -1076,18 +1076,26 @@ data "aws_iam_policy_document" "partner_demo_access" {
     resources = ["*"]
   }
 
-  # Read-only. Wave mutations run under the step-dispatcher Lambda's role.
+  # Read-only, plus InitializeService to turn the service on.
+  #
+  # Wildcards rather than an enumeration: every mgn Describe*/Get*/List* action
+  # is classified Read or List in the service authorization reference, so these
+  # cannot reach a write verb. The list they replace named only DescribeJobs,
+  # DescribeReplicationConfigurationTemplates, DescribeSourceServers,
+  # DescribeVcenterClients, GetLaunchConfiguration and ListTagsForResource,
+  # which is narrower than the console needs: rendering the vCenter clients and
+  # source server pages also calls GetAccountSettings, ListConnectors,
+  # ListApplications and ListWaves, and each one failed on its own denial.
+  #
+  # Wave mutations still run under the step-dispatcher Lambda's role.
   statement {
     sid    = "TransformAgentsMgnRead"
     effect = "Allow"
     actions = [
-      "mgn:DescribeJobs",
-      "mgn:DescribeReplicationConfigurationTemplates",
-      "mgn:DescribeSourceServers",
-      "mgn:DescribeVcenterClients",
-      "mgn:GetLaunchConfiguration",
+      "mgn:Describe*",
+      "mgn:Get*",
       "mgn:InitializeService",
-      "mgn:ListTagsForResource",
+      "mgn:List*",
     ]
     resources = ["*"]
   }
