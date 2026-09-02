@@ -182,3 +182,11 @@ variable "demo_app_region" {
   description = "Region hosting the partner demo web application."
   default     = "us-east-1"
 }
+
+# Prefix the transform-agents PoC stack's DynamoDB, Lambda, ECR, Scheduler, S3,
+# Budgets and IAM access is scoped to, in the partner_demo_access document.
+variable "transform_agents_prefix" {
+  type        = string
+  description = "Resource name prefix for the transform-agents PoC stack."
+  default     = "transform-agents"
+}

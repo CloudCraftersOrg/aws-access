@@ -774,8 +774,9 @@ data "aws_iam_policy_document" "devops_agent_access" {
 # Used by: AWSTransformAccess, the only set allowed outside var.region
 # (us-west-2 plus us-east-1, because the partner service is us-east-1 only).
 #
-# AWS Transform demo cohort: sign in to the web app, plus deploy the legacy
-# fbctf stack the demo modernizes.
+# AWS Transform demo cohort: sign in to the web app, deploy the legacy fbctf
+# stack the demo modernizes, and run the transform-agents PoC (Bedrock plus
+# its own transform-agents-* stack).
 #
 # The AWSTransform* half is small because the service only authorizes entry to
 # its web app with IAM, then hands off to its own workspace roles for everything
@@ -1018,10 +1019,12 @@ data "aws_iam_policy_document" "partner_demo_access" {
       test     = "StringEquals"
       variable = "iam:AWSServiceName"
       values = [
+        "application-migration.amazonaws.com",
         "autoscaling.amazonaws.com",
         "elasticache.amazonaws.com",
         "elasticloadbalancing.amazonaws.com",
         "rds.amazonaws.com",
+        "scheduler.amazonaws.com",
       ]
     }
   }
@@ -1035,6 +1038,262 @@ data "aws_iam_policy_document" "partner_demo_access" {
       "arn:aws:secretsmanager:*:*:secret:${var.demo_app_prefix}-*",
       "arn:aws:secretsmanager:*:*:secret:rds!*",
     ]
+  }
+
+  # transform-agents PoC. Invoke Bedrock and run its own DynamoDB / Lambda / ECR
+  # / AgentCore / Scheduler / S3 / Budgets stack, scoped to
+  # transform_agents_prefix-*. logs, cloudwatch and ssm are already covered by
+  # FbctfInfraDeploy above.
+  statement {
+    sid    = "TransformAgentsBedrock"
+    effect = "Allow"
+    actions = [
+      "bedrock:ApplyGuardrail",
+      "bedrock:Converse",
+      "bedrock:ConverseStream",
+      "bedrock:CreateGuardrail",
+      "bedrock:CreateGuardrailVersion",
+      "bedrock:DeleteGuardrail",
+      "bedrock:Get*",
+      "bedrock:InvokeModel",
+      "bedrock:InvokeModelWithResponseStream",
+      "bedrock:List*",
+      "bedrock:TagResource",
+      "bedrock:UntagResource",
+      "bedrock:UpdateGuardrail",
+    ]
+    resources = ["*"]
+  }
+
+  # Service-wide: AgentCore ARNs share no prefix. Contained by the region
+  # lockdown and the cohort-only grant, as with transform-custom:* above.
+  statement {
+    sid       = "TransformAgentsAgentCore"
+    effect    = "Allow"
+    actions   = ["bedrock-agentcore:*"]
+    resources = ["*"]
+  }
+
+  # Read-only. Wave mutations run under the step-dispatcher Lambda's role.
+  statement {
+    sid    = "TransformAgentsMgnRead"
+    effect = "Allow"
+    actions = [
+      "mgn:DescribeJobs",
+      "mgn:DescribeReplicationConfigurationTemplates",
+      "mgn:DescribeSourceServers",
+      "mgn:DescribeVcenterClients",
+      "mgn:GetLaunchConfiguration",
+      "mgn:InitializeService",
+      "mgn:ListTagsForResource",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "TransformAgentsTables"
+    effect = "Allow"
+    actions = [
+      "dynamodb:BatchGetItem",
+      "dynamodb:BatchWriteItem",
+      "dynamodb:CreateTable",
+      "dynamodb:DeleteItem",
+      "dynamodb:DeleteTable",
+      "dynamodb:DescribeContinuousBackups",
+      "dynamodb:DescribeTable",
+      "dynamodb:DescribeTimeToLive",
+      "dynamodb:GetItem",
+      "dynamodb:ListTagsOfResource",
+      "dynamodb:PutItem",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+      "dynamodb:TagResource",
+      "dynamodb:UntagResource",
+      "dynamodb:UpdateContinuousBackups",
+      "dynamodb:UpdateItem",
+      "dynamodb:UpdateTable",
+      "dynamodb:UpdateTimeToLive",
+    ]
+    resources = ["arn:aws:dynamodb:*:*:table/${var.transform_agents_prefix}-*"]
+  }
+
+  statement {
+    sid       = "TransformAgentsListTables"
+    effect    = "Allow"
+    actions   = ["dynamodb:ListTables"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "TransformAgentsLambda"
+    effect = "Allow"
+    actions = [
+      "lambda:AddPermission",
+      "lambda:CreateAlias",
+      "lambda:CreateFunction",
+      "lambda:DeleteAlias",
+      "lambda:DeleteFunction",
+      "lambda:GetAlias",
+      "lambda:GetFunction",
+      "lambda:GetFunctionConfiguration",
+      "lambda:GetPolicy",
+      "lambda:InvokeFunction",
+      "lambda:ListTags",
+      "lambda:ListVersionsByFunction",
+      "lambda:PublishVersion",
+      "lambda:RemovePermission",
+      "lambda:TagResource",
+      "lambda:UntagResource",
+      "lambda:UpdateAlias",
+      "lambda:UpdateFunctionCode",
+      "lambda:UpdateFunctionConfiguration",
+    ]
+    resources = ["arn:aws:lambda:*:*:function:${var.transform_agents_prefix}-*"]
+  }
+
+  statement {
+    sid    = "TransformAgentsSchedule"
+    effect = "Allow"
+    actions = [
+      "scheduler:CreateSchedule",
+      "scheduler:DeleteSchedule",
+      "scheduler:GetSchedule",
+      "scheduler:ListSchedules",
+      "scheduler:TagResource",
+      "scheduler:UntagResource",
+      "scheduler:UpdateSchedule",
+    ]
+    resources = ["arn:aws:scheduler:*:*:schedule/*/${var.transform_agents_prefix}-*"]
+  }
+
+  statement {
+    sid       = "TransformAgentsEcrAuth"
+    effect    = "Allow"
+    actions   = ["ecr:GetAuthorizationToken"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "TransformAgentsEcr"
+    effect = "Allow"
+    actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:BatchGetImage",
+      "ecr:CompleteLayerUpload",
+      "ecr:CreateRepository",
+      "ecr:DeleteRepository",
+      "ecr:DescribeImages",
+      "ecr:DescribeRepositories",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:GetRepositoryPolicy",
+      "ecr:InitiateLayerUpload",
+      "ecr:ListImages",
+      "ecr:PutImage",
+      "ecr:PutLifecyclePolicy",
+      "ecr:SetRepositoryPolicy",
+      "ecr:TagResource",
+      "ecr:UntagResource",
+      "ecr:UploadLayerPart",
+    ]
+    resources = ["arn:aws:ecr:*:*:repository/${var.transform_agents_prefix}-*"]
+  }
+
+  statement {
+    sid    = "TransformAgentsBuckets"
+    effect = "Allow"
+    actions = [
+      "s3:CreateBucket",
+      "s3:DeleteBucket",
+      "s3:DeleteObject",
+      "s3:GetBucketLocation",
+      "s3:GetBucketPolicy",
+      "s3:GetBucketPublicAccessBlock",
+      "s3:GetBucketVersioning",
+      "s3:GetEncryptionConfiguration",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:ListBucketVersions",
+      "s3:PutBucketPolicy",
+      "s3:PutBucketPublicAccessBlock",
+      "s3:PutBucketVersioning",
+      "s3:PutEncryptionConfiguration",
+      "s3:PutObject",
+    ]
+    resources = [
+      "arn:aws:s3:::${var.transform_agents_prefix}-*",
+      "arn:aws:s3:::${var.transform_agents_prefix}-*/*",
+    ]
+  }
+
+  # Runbook knowledge base. No resource-level actions published yet.
+  statement {
+    sid     = "TransformAgentsVectorStore"
+    effect  = "Allow"
+    actions = ["s3vectors:*"]
+    resources = [
+      "arn:aws:s3vectors:*:*:bucket/${var.transform_agents_prefix}-*",
+      "arn:aws:s3vectors:*:*:bucket/${var.transform_agents_prefix}-*/*",
+    ]
+  }
+
+  statement {
+    sid    = "TransformAgentsBudget"
+    effect = "Allow"
+    actions = [
+      "budgets:CreateBudget",
+      "budgets:DeleteBudget",
+      "budgets:DescribeBudget",
+      "budgets:ModifyBudget",
+      "budgets:ViewBudget",
+    ]
+    resources = ["arn:aws:budgets::*:budget/${var.transform_agents_prefix}-*"]
+  }
+
+  # The runtime and step-dispatcher roles, path-scoped like FbctfIamWriteScoped.
+  statement {
+    sid    = "TransformAgentsRoles"
+    effect = "Allow"
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreatePolicy",
+      "iam:CreatePolicyVersion",
+      "iam:CreateRole",
+      "iam:DeletePolicy",
+      "iam:DeletePolicyVersion",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:PutRolePolicy",
+      "iam:TagPolicy",
+      "iam:TagRole",
+      "iam:UntagPolicy",
+      "iam:UntagRole",
+      "iam:UpdateAssumeRolePolicy",
+      "iam:UpdateRole",
+      "iam:UpdateRoleDescription",
+    ]
+    resources = [
+      "arn:aws:iam::*:policy/${var.transform_agents_prefix}-*",
+      "arn:aws:iam::*:role/${var.transform_agents_prefix}-*",
+    ]
+  }
+
+  statement {
+    sid       = "TransformAgentsPassRole"
+    effect    = "Allow"
+    actions   = ["iam:PassRole"]
+    resources = ["arn:aws:iam::*:role/${var.transform_agents_prefix}-*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values = [
+        "bedrock-agentcore.amazonaws.com",
+        "bedrock.amazonaws.com",
+        "lambda.amazonaws.com",
+        "scheduler.amazonaws.com",
+      ]
+    }
   }
 }
 
