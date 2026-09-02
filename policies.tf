@@ -960,9 +960,11 @@ data "aws_iam_policy_document" "partner_demo_access" {
     resources = ["*"]
   }
 
-  # These do take a Connection, but its ID is a server-generated UUID, so
-  # connection/* is as tight as this goes. There is no name prefix to scope on
-  # the way the fbctf-* statements below do.
+  # Connection IDs are server-generated UUIDs, so there is no name prefix to
+  # scope on the way the fbctf-* statements below do. The resource field is
+  # wildcarded rather than set to connection/* because ListConnections is
+  # authorized against an account-level `...:*` ARN that connection/* does not
+  # match.
   statement {
     sid    = "AWSTransformSourceConnections"
     effect = "Allow"
@@ -976,6 +978,72 @@ data "aws_iam_policy_document" "partner_demo_access" {
       "codeconnections:UpdateConnectionInstallation",
     ]
     resources = ["arn:aws:codeconnections:*:*:*"]
+  }
+
+  # AWS Transform deploys its CodeBuild execution role as a CloudFormation stack
+  # run from the user's own session, not from a service role, so the cohort needs
+  # stack rights of its own.
+  #
+  # Scoped to AWSTransform* stack names. Nothing else in this set needs
+  # CloudFormation: the fbctf and transform-agents stacks are Terraform.
+  statement {
+    sid    = "AWSTransformStacks"
+    effect = "Allow"
+    actions = [
+      "cloudformation:CreateStack",
+      "cloudformation:DeleteStack",
+      "cloudformation:DescribeStackEvents",
+      "cloudformation:DescribeStackResource",
+      "cloudformation:DescribeStackResources",
+      "cloudformation:DescribeStacks",
+      "cloudformation:GetTemplate",
+      "cloudformation:ListStackResources",
+      "cloudformation:UpdateStack",
+    ]
+    resources = ["arn:aws:cloudformation:*:*:stack/AWSTransform*/*"]
+  }
+
+  # No resource type on any of these. ListStacks is here rather than above
+  # because DescribeStacks called without a stack name falls back to it.
+  statement {
+    sid    = "AWSTransformStacksAccountWide"
+    effect = "Allow"
+    actions = [
+      "cloudformation:CreateUploadBucket",
+      "cloudformation:DescribeAccountLimits",
+      "cloudformation:GetTemplateSummary",
+      "cloudformation:ListStacks",
+      "cloudformation:ValidateTemplate",
+    ]
+    resources = ["*"]
+  }
+
+  # CloudFormation applies the template with the caller's permissions, and this
+  # stack exists only to create a role, so CreateStack above accomplishes nothing
+  # without this.
+  #
+  # AWSTransform* deliberately, not the AWSTransform-* used by
+  # AWSTransformConnectorServiceRole further up: the stack's role is named
+  # AWSTransformCodeBuildExecutionRole, with no hyphen, so it falls outside that
+  # scope. Both role paths are listed because the template chooses the path.
+  statement {
+    sid    = "AWSTransformCodeBuildExecutionRole"
+    effect = "Allow"
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:PassRole",
+      "iam:PutRolePolicy",
+      "iam:TagRole",
+      "iam:UntagRole",
+    ]
+    resources = [
+      "arn:aws:iam::*:role/AWSTransform*",
+      "arn:aws:iam::*:role/service-role/AWSTransform*",
+    ]
   }
 
   # Service-wide allows are acceptable here: the set is region-locked, granted
