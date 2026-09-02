@@ -931,6 +931,53 @@ data "aws_iam_policy_document" "partner_demo_access" {
     }
   }
 
+  # AWS Transform reaches a source code repository through CodeConnections, so
+  # that half of the console is authorized under the codeconnections prefix and
+  # nothing above covers it. This is NOT the same thing as the
+  # AWSTransformConnector* statements: those are AWS Transform's own
+  # cross-account connectors, this is the Git provider handshake (GitHub,
+  # GitLab, Bitbucket).
+  #
+  # Only the codeconnections prefix is granted. The console used
+  # codestar-connections before July 2024 and still accepts it for connections
+  # created back then, but this organization has none that old and the console
+  # calls the new prefix.
+  #
+  # Split in two by what can be scoped: none of the actions below support
+  # resource-level permissions, so they can only be granted on "*".
+  statement {
+    sid    = "AWSTransformSourceConnectionHandshake"
+    effect = "Allow"
+    actions = [
+      "codeconnections:CreateConnection",
+      "codeconnections:GetIndividualAccessToken",
+      "codeconnections:GetInstallationUrl",
+      "codeconnections:ListInstallationTargets",
+      "codeconnections:PassConnection",
+      "codeconnections:StartOAuthHandshake",
+      "codeconnections:UseConnection",
+    ]
+    resources = ["*"]
+  }
+
+  # These do take a Connection, but its ID is a server-generated UUID, so
+  # connection/* is as tight as this goes. There is no name prefix to scope on
+  # the way the fbctf-* statements below do.
+  statement {
+    sid    = "AWSTransformSourceConnections"
+    effect = "Allow"
+    actions = [
+      "codeconnections:DeleteConnection",
+      "codeconnections:GetConnection",
+      "codeconnections:ListConnections",
+      "codeconnections:ListTagsForResource",
+      "codeconnections:TagResource",
+      "codeconnections:UntagResource",
+      "codeconnections:UpdateConnectionInstallation",
+    ]
+    resources = ["arn:aws:codeconnections:*:*:connection/*"]
+  }
+
   # Service-wide allows are acceptable here: the set is region-locked, granted
   # only to the cohort, and the sensitive edges are prefix-scoped below.
   statement {
