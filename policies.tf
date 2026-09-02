@@ -1147,6 +1147,15 @@ data "aws_iam_policy_document" "partner_demo_access" {
     }
   }
 
+  # AgentCore creates a service-linked role per sub-service (gateway network, network, and more
+  # as the service grows). Scoping by path covers them without enumerating principals.
+  statement {
+    sid       = "AgentCoreServiceLinkedRoles"
+    effect    = "Allow"
+    actions   = ["iam:CreateServiceLinkedRole"]
+    resources = ["arn:aws:iam::*:role/aws-service-role/*bedrock-agentcore.amazonaws.com/*"]
+  }
+
   # rds!* covers the master secret RDS creates when it manages the password.
   statement {
     sid     = "FbctfSecrets"
