@@ -48,27 +48,35 @@ variable "permission_sets" {
       description       = "Modify existing workshop infra (no create/destroy) plus invoke AgentCore runtime"
       inline_policy_key = "infra_modify_only"
     }
+    DevOpsAgentAccess = {
+      description       = "Diagnose common AWS infrastructure and deploy the helper resources used by AWS DevOps Agent demos"
+      inline_policy_key = "devops_agent_access"
+      allowed_regions   = ["us-east-1", "us-west-2"]
+    }
     AWSTransformAccess = {
       description       = "AWS Transform demo cohort: web app sign-in plus deploying the fbctf demo app"
       inline_policy_key = "partner_demo_access"
       allowed_regions   = ["us-west-2", "us-east-1"]
     }
-    # us-east-1 as well, or an auditor cannot see the Bedrock and AWS Transform
-    # activity that already happens there.
+    # Every AWS region in the Americas. Write still stays confined to the
+    # controls and to AIGovernance-* resources by the ai_governance document.
     AIGovernance = {
-      description       = "Audit AI service usage and manage the Bedrock guardrails constraining it"
+      description       = "Inventory, govern and audit AI service usage across the Americas"
       inline_policy_key = "ai_governance"
-      allowed_regions   = ["us-west-2", "us-east-1"]
+      allowed_regions = [
+        "ca-central-1", "ca-west-1", "mx-central-1", "sa-east-1",
+        "us-east-1", "us-east-2", "us-west-1", "us-west-2",
+      ]
     }
   }
 
   validation {
     condition = alltrue([
       for k, v in var.permission_sets :
-      contains(["power_user_access", "infra_modify_only", "partner_demo_access", "ai_governance"], v.inline_policy_key)
+      contains(["power_user_access", "infra_modify_only", "devops_agent_access", "partner_demo_access", "ai_governance"], v.inline_policy_key)
       if v.inline_policy_key != null
     ])
-    error_message = "inline_policy_key must be one of: power_user_access, infra_modify_only, partner_demo_access, ai_governance."
+    error_message = "inline_policy_key must be one of: power_user_access, infra_modify_only, devops_agent_access, partner_demo_access, ai_governance."
   }
 
   validation {
@@ -121,6 +129,7 @@ variable "grants" {
     Sandbox = {
       Administrators = ["AdministratorAccess", "PowerUserAccess", "ReadOnlyAccess", "AWSTransformAccess"]
       Workshops      = ["PowerUserAccess"]
+      DevOpsAgent    = ["DevOpsAgentAccess"]
       AWSTransform   = ["AWSTransformAccess"]
       AIGovernance   = ["AIGovernance"]
     }
@@ -172,4 +181,12 @@ variable "demo_app_region" {
   type        = string
   description = "Region hosting the partner demo web application."
   default     = "us-east-1"
+}
+
+# Prefix the transform-agents PoC stack's DynamoDB, Lambda, ECR, Scheduler, S3,
+# Budgets and IAM access is scoped to, in the partner_demo_access document.
+variable "transform_agents_prefix" {
+  type        = string
+  description = "Resource name prefix for the transform-agents PoC stack."
+  default     = "transform-agents"
 }
