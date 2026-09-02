@@ -1238,30 +1238,15 @@ data "aws_iam_policy_document" "partner_demo_access" {
     ]
   }
 
+  # Collapsed from an enumeration to service:* on the same prefix-scoped
+  # resource, to stay under the 10,240 non-whitespace byte cap on a permission
+  # set inline policy. Same trade already made by FbctfS3, FbctfSecrets and
+  # TransformAgentsVectorStore: the prefix, not the verb list, is what contains
+  # these. Re-enumerating any of them costs roughly 400-550 bytes of budget.
   statement {
-    sid    = "TransformAgentsTables"
-    effect = "Allow"
-    actions = [
-      "dynamodb:BatchGetItem",
-      "dynamodb:BatchWriteItem",
-      "dynamodb:CreateTable",
-      "dynamodb:DeleteItem",
-      "dynamodb:DeleteTable",
-      "dynamodb:DescribeContinuousBackups",
-      "dynamodb:DescribeTable",
-      "dynamodb:DescribeTimeToLive",
-      "dynamodb:GetItem",
-      "dynamodb:ListTagsOfResource",
-      "dynamodb:PutItem",
-      "dynamodb:Query",
-      "dynamodb:Scan",
-      "dynamodb:TagResource",
-      "dynamodb:UntagResource",
-      "dynamodb:UpdateContinuousBackups",
-      "dynamodb:UpdateItem",
-      "dynamodb:UpdateTable",
-      "dynamodb:UpdateTimeToLive",
-    ]
+    sid       = "TransformAgentsTables"
+    effect    = "Allow"
+    actions   = ["dynamodb:*"]
     resources = ["arn:aws:dynamodb:*:*:table/${var.transform_agents_prefix}-*"]
   }
 
@@ -1273,31 +1258,9 @@ data "aws_iam_policy_document" "partner_demo_access" {
   }
 
   statement {
-    sid    = "TransformAgentsLambda"
-    effect = "Allow"
-    actions = [
-      "lambda:AddPermission",
-      "lambda:CreateAlias",
-      "lambda:CreateFunction",
-      "lambda:DeleteAlias",
-      "lambda:DeleteFunction",
-      "lambda:GetAlias",
-      "lambda:GetFunction",
-      "lambda:GetFunctionCodeSigningConfig",
-      "lambda:GetFunctionConfiguration",
-      "lambda:GetFunctionEventInvokeConfig",
-      "lambda:GetPolicy",
-      "lambda:InvokeFunction",
-      "lambda:ListTags",
-      "lambda:ListVersionsByFunction",
-      "lambda:PublishVersion",
-      "lambda:RemovePermission",
-      "lambda:TagResource",
-      "lambda:UntagResource",
-      "lambda:UpdateAlias",
-      "lambda:UpdateFunctionCode",
-      "lambda:UpdateFunctionConfiguration",
-    ]
+    sid       = "TransformAgentsLambda"
+    effect    = "Allow"
+    actions   = ["lambda:*"]
     resources = ["arn:aws:lambda:*:*:function:${var.transform_agents_prefix}-*"]
   }
 
@@ -1324,51 +1287,16 @@ data "aws_iam_policy_document" "partner_demo_access" {
   }
 
   statement {
-    sid    = "TransformAgentsEcr"
-    effect = "Allow"
-    actions = [
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:BatchGetImage",
-      "ecr:CompleteLayerUpload",
-      "ecr:CreateRepository",
-      "ecr:DeleteRepository",
-      "ecr:DescribeImages",
-      "ecr:DescribeRepositories",
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:GetRepositoryPolicy",
-      "ecr:InitiateLayerUpload",
-      "ecr:ListImages",
-      "ecr:PutImage",
-      "ecr:PutLifecyclePolicy",
-      "ecr:SetRepositoryPolicy",
-      "ecr:TagResource",
-      "ecr:UntagResource",
-      "ecr:UploadLayerPart",
-    ]
+    sid       = "TransformAgentsEcr"
+    effect    = "Allow"
+    actions   = ["ecr:*"]
     resources = ["arn:aws:ecr:*:*:repository/${var.transform_agents_prefix}-*"]
   }
 
   statement {
-    sid    = "TransformAgentsBuckets"
-    effect = "Allow"
-    actions = [
-      "s3:CreateBucket",
-      "s3:DeleteBucket",
-      "s3:DeleteObject",
-      "s3:GetBucketLocation",
-      "s3:GetBucketPolicy",
-      "s3:GetBucketPublicAccessBlock",
-      "s3:GetBucketVersioning",
-      "s3:GetEncryptionConfiguration",
-      "s3:GetObject",
-      "s3:ListBucket",
-      "s3:ListBucketVersions",
-      "s3:PutBucketPolicy",
-      "s3:PutBucketPublicAccessBlock",
-      "s3:PutBucketVersioning",
-      "s3:PutEncryptionConfiguration",
-      "s3:PutObject",
-    ]
+    sid     = "TransformAgentsBuckets"
+    effect  = "Allow"
+    actions = ["s3:*"]
     resources = [
       "arn:aws:s3:::${var.transform_agents_prefix}-*",
       "arn:aws:s3:::${var.transform_agents_prefix}-*/*",
