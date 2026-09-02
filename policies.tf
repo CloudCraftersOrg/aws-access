@@ -1020,6 +1020,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
       variable = "iam:AWSServiceName"
       values = [
         "bedrock-agentcore.amazonaws.com",
+        "network.bedrock-agentcore.amazonaws.com",
         "drs.amazonaws.com",
         "mgn.amazonaws.com",
         "autoscaling.amazonaws.com",
