@@ -31,9 +31,16 @@ variable "permission_sets" {
   description = "Permission sets to create, keyed by name."
 
   default = {
+    # allowed_regions is set even though this set carries AdministratorAccess:
+    # region_restriction is merged into every set, so leaving it null pinned the
+    # org's admins to us-west-2 alone and any us-east-1 call came back as an
+    # explicit deny. us-east-1 is where the partner services (AWS Transform,
+    # MGN) live, and admins have to be able to reach them to validate the
+    # cohort's access.
     AdministratorAccess = {
       description        = "Full administrative access to all AWS services"
       managed_policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+      allowed_regions    = ["us-east-1", "us-west-2"]
     }
     # Not the AWS managed PowerUserAccess policy. See policies.tf.
     PowerUserAccess = {
