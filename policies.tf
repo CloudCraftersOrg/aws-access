@@ -975,7 +975,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
       "codeconnections:UntagResource",
       "codeconnections:UpdateConnectionInstallation",
     ]
-    resources = ["arn:aws:codeconnections:*"]
+    resources = ["arn:aws:codeconnections:*:*:*"]
   }
 
   # Service-wide allows are acceptable here: the set is region-locked, granted
