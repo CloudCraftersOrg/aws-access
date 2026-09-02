@@ -39,4 +39,21 @@ resource "aws_ssoadmin_permission_set_inline_policy" "this" {
   instance_arn       = local.sso_instance_arn
   permission_set_arn = aws_ssoadmin_permission_set.this[each.key].arn
   inline_policy      = data.aws_iam_policy_document.permission_set_inline[each.key].json
+
+  # Identity Center caps a permission set's inline policy at 10,240 bytes,
+  # counting non-whitespace only, and the merged document here is easily large
+  # enough to reach it — region_restriction alone is ~600 bytes before a set's
+  # own statements. Without this the overflow surfaces as an opaque
+  # ValidationException from PutInlinePolicyToPermissionSet at apply time, after
+  # the earlier sets have already been written.
+  #
+  # When this trips, collapse an enumerated action list on an already
+  # prefix-scoped resource to service:* rather than dropping permissions. The
+  # prefix is what contains those statements, not the verb list.
+  lifecycle {
+    precondition {
+      condition     = length(replace(data.aws_iam_policy_document.permission_set_inline[each.key].json, "/\\s/", "")) <= 10240
+      error_message = "Inline policy for permission set '${each.key}' is ${length(replace(data.aws_iam_policy_document.permission_set_inline[each.key].json, "/\\s/", ""))} non-whitespace bytes, over the 10240 limit."
+    }
+  }
 }
