@@ -68,15 +68,22 @@ variable "permission_sets" {
         "us-east-1", "us-east-2", "us-west-1", "us-west-2",
       ]
     }
+    # Multi-agent migration PoC on AWS Transform. Its stack is name-scoped to
+    # transform-agents-*; see transform_agents_access in policies.tf.
+    TransformAgentsAccess = {
+      description       = "Multi-agent migration PoC: Bedrock invoke plus its own DynamoDB/Lambda/AgentCore stack, scoped to transform-agents-*"
+      inline_policy_key = "transform_agents_access"
+      allowed_regions   = ["us-west-2", "us-east-1"]
+    }
   }
 
   validation {
     condition = alltrue([
       for k, v in var.permission_sets :
-      contains(["power_user_access", "infra_modify_only", "devops_agent_access", "partner_demo_access", "ai_governance"], v.inline_policy_key)
+      contains(["power_user_access", "infra_modify_only", "devops_agent_access", "partner_demo_access", "ai_governance", "transform_agents_access"], v.inline_policy_key)
       if v.inline_policy_key != null
     ])
-    error_message = "inline_policy_key must be one of: power_user_access, infra_modify_only, devops_agent_access, partner_demo_access, ai_governance."
+    error_message = "inline_policy_key must be one of: power_user_access, infra_modify_only, devops_agent_access, partner_demo_access, ai_governance, transform_agents_access."
   }
 
   validation {
@@ -124,13 +131,13 @@ variable "grants" {
     }
 
     # Workshops gets PowerUserAccess, which here is read-only. Administrators
-    # also carry AWSTransformAccess so that set can be validated without
-    # joining the cohort group.
+    # also carry AWSTransformAccess and TransformAgentsAccess so those sets can
+    # be validated without joining the cohort group.
     Sandbox = {
-      Administrators = ["AdministratorAccess", "PowerUserAccess", "ReadOnlyAccess", "AWSTransformAccess"]
+      Administrators = ["AdministratorAccess", "PowerUserAccess", "ReadOnlyAccess", "AWSTransformAccess", "TransformAgentsAccess"]
       Workshops      = ["PowerUserAccess"]
       DevOpsAgent    = ["DevOpsAgentAccess"]
-      AWSTransform   = ["AWSTransformAccess"]
+      AWSTransform   = ["AWSTransformAccess", "TransformAgentsAccess"]
       AIGovernance   = ["AIGovernance"]
     }
   }
@@ -181,4 +188,12 @@ variable "demo_app_region" {
   type        = string
   description = "Region hosting the partner demo web application."
   default     = "us-east-1"
+}
+
+# Prefix the migration PoC stack's DynamoDB, Lambda, ECR, Scheduler, S3, Budgets
+# and IAM access is scoped to.
+variable "transform_agents_prefix" {
+  type        = string
+  description = "Resource name prefix for the multi-agent migration PoC stack."
+  default     = "transform-agents"
 }

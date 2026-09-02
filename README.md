@@ -95,7 +95,7 @@ Open an issue or ask a code owner. It is not possible from here, by design.
 
 ## What exists today
 
-Six permission sets, all with an 8-hour session:
+Eight permission sets, all with an 8-hour session:
 
 | Permission set | Backed by | Regions |
 |---|---|---|
@@ -103,8 +103,10 @@ Six permission sets, all with an 8-hour session:
 | `ReadOnlyAccess` | managed `ReadOnlyAccess` | `us-west-2` |
 | `PowerUserAccess` | inline `power_user_access` | `us-west-2` |
 | `WorkshopOnlyAccess` | inline `infra_modify_only` | `us-west-2` |
+| `DevOpsAgentAccess` | inline `devops_agent_access` | `us-west-2`, `us-east-1` |
 | `AWSTransformAccess` | inline `partner_demo_access` | `us-west-2`, `us-east-1` |
-| `AIGovernance` | inline `ai_governance` | `us-west-2`, `us-east-1` |
+| `AIGovernance` | inline `ai_governance` | Americas |
+| `TransformAgentsAccess` | inline `transform_agents_access` | `us-west-2`, `us-east-1` |
 
 Every set — including the two managed-policy ones — also gets a region lockdown
 merged into its inline policy. Global and region-agnostic services (IAM, STS,
@@ -131,9 +133,11 @@ Grants are `account name → group display name → permission set names`:
 | | `Developers` | PowerUser |
 | | `InfraModifiers` | WorkshopOnly |
 | | `ReadOnly` | ReadOnly |
-| `Sandbox` | `Administrators` | Administrator, PowerUser, ReadOnly, AWSTransform |
+| `Sandbox` | `Administrators` | Administrator, PowerUser, ReadOnly, AWSTransform, TransformAgents |
 | | `Workshops` | PowerUser |
-| | `AWSTransform` | AWSTransform |
+| | `DevOpsAgent` | DevOpsAgent |
+| | `AWSTransform` | AWSTransform, TransformAgents |
+| | `AIGovernance` | AIGovernance |
 
 Only groups are ever assigned. There are no user-level assignments, by design.
 
@@ -202,8 +206,10 @@ with a level of access they already have.
    |---|---|
    | `PowerUserAccess` | `power_user_access` |
    | `WorkshopOnlyAccess` | `infra_modify_only` |
+   | `DevOpsAgentAccess` | `devops_agent_access` |
    | `AWSTransformAccess` | `partner_demo_access` |
    | `AIGovernance` | `ai_governance` |
+   | `TransformAgentsAccess` | `transform_agents_access` |
 
 2. Add a statement, or actions to an existing one. Keep the narrowest verbs that
    do the job — prefer `sqs:GetQueueAttributes` over `sqs:*`.
@@ -400,10 +406,11 @@ time; backend wiring comes from repository secrets. `.gitignore` covers
 negation patterns.
 
 Names of resources the policies *grant on* are fine to commit — they are targets,
-not credentials. Three are committed as variable defaults today:
-`state_bucket_names`, `demo_app_prefix` and `demo_app_region`. If a new policy
-needs a resource name to scope to, add a variable for it rather than inlining the
-string, so every such name stays visible in one place.
+not credentials. Four are committed as variable defaults today:
+`state_bucket_names`, `demo_app_prefix`, `demo_app_region` and
+`transform_agents_prefix`. If a new policy needs a resource name to scope to, add
+a variable for it rather than inlining the string, so every such name stays
+visible in one place.
 
 Every variable runs on its committed default. The workflow sets no `TF_VAR_*` and
 passes no `-var-file`, so `variables.tf` is the whole desired state.
@@ -444,12 +451,13 @@ State locking is S3-native; there is no DynamoDB table.
 
 | Name | Purpose | Default |
 |---|---|---|
-| `permission_sets` | The available access levels | the five sets above |
+| `permission_sets` | The available access levels | the sets above |
 | `grants` | Account name → group name → permission sets | the table above |
 | `region` | Identity Center region and the default region lockdown | `us-west-2` |
 | `state_bucket_names` | Buckets the modify-only set may read/write | `["cloudcrafters-workshop-2026-tfstate"]` |
 | `demo_app_prefix` | Resource prefix scoping the demo stack | `fbctf` |
 | `demo_app_region` | Region for the partner demo web app | `us-east-1` |
+| `transform_agents_prefix` | Resource prefix scoping the migration PoC stack | `transform-agents` |
 
 ### Outputs
 

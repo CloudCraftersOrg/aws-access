@@ -12,6 +12,7 @@
 #   DevOpsAgentAccess     devops_agent_access              this file
 #   AWSTransformAccess    partner_demo_access              this file
 #   AIGovernance          ai_governance                    this file
+#   TransformAgentsAccess transform_agents_access           this file
 #
 # Read that table rather than trusting the names. They do not line up: the keys
 # here are snake_case while the sets are PascalCase, `PowerUserAccess` is a
@@ -52,6 +53,8 @@ locals {
     devops_agent_access = data.aws_iam_policy_document.devops_agent_access.json # DevOpsAgentAccess
     partner_demo_access = data.aws_iam_policy_document.partner_demo_access.json # AWSTransformAccess
     ai_governance       = data.aws_iam_policy_document.ai_governance.json       # AIGovernance
+
+    transform_agents_access = data.aws_iam_policy_document.transform_agents_access.json # TransformAgentsAccess
   }
 }
 
@@ -1518,6 +1521,336 @@ data "aws_iam_policy_document" "ai_governance" {
         "bedrock.*.amazonaws.com",
         "logs.*.amazonaws.com",
         "s3.*.amazonaws.com",
+      ]
+    }
+  }
+}
+
+# Used by: TransformAgentsAccess. Allowed in us-west-2 and us-east-1.
+#
+# Multi-agent migration PoC on top of AWS Transform: invoke Bedrock models,
+# screen them with a Guardrail, and run its own DynamoDB / Lambda / ECR /
+# AgentCore / Scheduler / S3 / Budgets stack. Reads are account-wide for
+# `terraform plan`; writes are scoped to transform_agents_prefix-*. Wave and
+# DNS mutations run under the step-dispatcher Lambda's role, not here.
+data "aws_iam_policy_document" "transform_agents_access" {
+  statement {
+    sid       = "ConsoleBaseline"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+
+  # Bake-off and agents, plus the prompt-injection guardrail. No resource-level
+  # scope, as on the AIGovernance set.
+  statement {
+    sid    = "Bedrock"
+    effect = "Allow"
+    actions = [
+      "bedrock:ApplyGuardrail",
+      "bedrock:Converse",
+      "bedrock:ConverseStream",
+      "bedrock:CreateGuardrail",
+      "bedrock:CreateGuardrailVersion",
+      "bedrock:DeleteGuardrail",
+      "bedrock:Get*",
+      "bedrock:InvokeModel",
+      "bedrock:InvokeModelWithResponseStream",
+      "bedrock:List*",
+      "bedrock:TagResource",
+      "bedrock:UntagResource",
+      "bedrock:UpdateGuardrail",
+    ]
+    resources = ["*"]
+  }
+
+  # wave_state, decision_log, step_ledger: table lifecycle for apply, item verbs
+  # for the agents.
+  statement {
+    sid    = "WaveStateTables"
+    effect = "Allow"
+    actions = [
+      "dynamodb:BatchGetItem",
+      "dynamodb:BatchWriteItem",
+      "dynamodb:CreateTable",
+      "dynamodb:DeleteItem",
+      "dynamodb:DeleteTable",
+      "dynamodb:DescribeContinuousBackups",
+      "dynamodb:DescribeTable",
+      "dynamodb:DescribeTimeToLive",
+      "dynamodb:GetItem",
+      "dynamodb:ListTagsOfResource",
+      "dynamodb:PutItem",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+      "dynamodb:TagResource",
+      "dynamodb:UntagResource",
+      "dynamodb:UpdateContinuousBackups",
+      "dynamodb:UpdateItem",
+      "dynamodb:UpdateTable",
+      "dynamodb:UpdateTimeToLive",
+    ]
+    resources = ["arn:aws:dynamodb:*:*:table/${var.transform_agents_prefix}-*"]
+  }
+
+  statement {
+    sid       = "DynamoDbListTables"
+    effect    = "Allow"
+    actions   = ["dynamodb:ListTables"]
+    resources = ["*"]
+  }
+
+  # Read-only. Wave mutations run under the dispatcher Lambda's role.
+  statement {
+    sid    = "MgnReadOnly"
+    effect = "Allow"
+    actions = [
+      "mgn:DescribeJobs",
+      "mgn:DescribeReplicationConfigurationTemplates",
+      "mgn:DescribeSourceServers",
+      "mgn:DescribeVcenterClients",
+      "mgn:GetLaunchConfiguration",
+      "mgn:InitializeService",
+      "mgn:ListTagsForResource",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "ObservabilityReadOnly"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:Describe*",
+      "cloudwatch:Get*",
+      "cloudwatch:List*",
+      "logs:Describe*",
+      "logs:FilterLogEvents",
+      "logs:Get*",
+      "logs:List*",
+      "logs:StartLiveTail",
+      "logs:StartQuery",
+      "logs:StopLiveTail",
+      "logs:StopQuery",
+    ]
+    resources = ["*"]
+  }
+
+  # Remediation's only write path. The agent enforces an SSM-document allow-list
+  # in code; SendCommand has no runtime-instance scope.
+  statement {
+    sid    = "RemediationSsm"
+    effect = "Allow"
+    actions = [
+      "ssm:DescribeInstanceInformation",
+      "ssm:GetCommandInvocation",
+      "ssm:ListCommandInvocations",
+      "ssm:ListCommands",
+      "ssm:SendCommand",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "TransformAgentsBuckets"
+    effect = "Allow"
+    actions = [
+      "s3:CreateBucket",
+      "s3:DeleteBucket",
+      "s3:DeleteObject",
+      "s3:GetBucketLocation",
+      "s3:GetBucketPolicy",
+      "s3:GetBucketPublicAccessBlock",
+      "s3:GetBucketVersioning",
+      "s3:GetEncryptionConfiguration",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:ListBucketVersions",
+      "s3:PutBucketPolicy",
+      "s3:PutBucketPublicAccessBlock",
+      "s3:PutBucketVersioning",
+      "s3:PutEncryptionConfiguration",
+      "s3:PutObject",
+    ]
+    resources = [
+      "arn:aws:s3:::${var.transform_agents_prefix}-*",
+      "arn:aws:s3:::${var.transform_agents_prefix}-*/*",
+    ]
+  }
+
+  # Runbook knowledge base. No resource-level actions published yet.
+  statement {
+    sid     = "RunbookVectorStore"
+    effect  = "Allow"
+    actions = ["s3vectors:*"]
+    resources = [
+      "arn:aws:s3vectors:*:*:bucket/${var.transform_agents_prefix}-*",
+      "arn:aws:s3vectors:*:*:bucket/${var.transform_agents_prefix}-*/*",
+    ]
+  }
+
+  statement {
+    sid    = "StepDispatcherLambda"
+    effect = "Allow"
+    actions = [
+      "lambda:AddPermission",
+      "lambda:CreateAlias",
+      "lambda:CreateFunction",
+      "lambda:DeleteAlias",
+      "lambda:DeleteFunction",
+      "lambda:GetAlias",
+      "lambda:GetFunction",
+      "lambda:GetFunctionConfiguration",
+      "lambda:GetPolicy",
+      "lambda:InvokeFunction",
+      "lambda:ListTags",
+      "lambda:ListVersionsByFunction",
+      "lambda:PublishVersion",
+      "lambda:RemovePermission",
+      "lambda:TagResource",
+      "lambda:UntagResource",
+      "lambda:UpdateAlias",
+      "lambda:UpdateFunctionCode",
+      "lambda:UpdateFunctionConfiguration",
+    ]
+    resources = ["arn:aws:lambda:*:*:function:${var.transform_agents_prefix}-*"]
+  }
+
+  statement {
+    sid    = "ResumeSchedule"
+    effect = "Allow"
+    actions = [
+      "scheduler:CreateSchedule",
+      "scheduler:DeleteSchedule",
+      "scheduler:GetSchedule",
+      "scheduler:ListSchedules",
+      "scheduler:TagResource",
+      "scheduler:UntagResource",
+      "scheduler:UpdateSchedule",
+    ]
+    resources = ["arn:aws:scheduler:*:*:schedule/*/${var.transform_agents_prefix}-*"]
+  }
+
+  # Service-wide: AgentCore ARNs share no prefix. Region-locked, cohort-only,
+  # the same rationale partner_demo uses for transform-custom:*.
+  statement {
+    sid       = "AgentCoreRuntime"
+    effect    = "Allow"
+    actions   = ["bedrock-agentcore:*"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "EcrAuthToken"
+    effect    = "Allow"
+    actions   = ["ecr:GetAuthorizationToken"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "RuntimeImageRepository"
+    effect = "Allow"
+    actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:BatchGetImage",
+      "ecr:CompleteLayerUpload",
+      "ecr:CreateRepository",
+      "ecr:DeleteRepository",
+      "ecr:DescribeImages",
+      "ecr:DescribeRepositories",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:GetRepositoryPolicy",
+      "ecr:InitiateLayerUpload",
+      "ecr:ListImages",
+      "ecr:PutImage",
+      "ecr:PutLifecyclePolicy",
+      "ecr:SetRepositoryPolicy",
+      "ecr:TagResource",
+      "ecr:UntagResource",
+      "ecr:UploadLayerPart",
+    ]
+    resources = ["arn:aws:ecr:*:*:repository/${var.transform_agents_prefix}-*"]
+  }
+
+  statement {
+    sid    = "BudgetTripwire"
+    effect = "Allow"
+    actions = [
+      "budgets:CreateBudget",
+      "budgets:DeleteBudget",
+      "budgets:DescribeBudget",
+      "budgets:ModifyBudget",
+      "budgets:ViewBudget",
+    ]
+    resources = ["arn:aws:budgets::*:budget/${var.transform_agents_prefix}-*"]
+  }
+
+  # Account-wide: terraform refresh resolves policies outside the prefix.
+  statement {
+    sid       = "IamReadOnly"
+    effect    = "Allow"
+    actions   = ["iam:Get*", "iam:List*"]
+    resources = ["*"]
+  }
+
+  # The runtime and step-dispatcher roles, path-scoped like the fbctf set.
+  statement {
+    sid    = "TransformAgentsRolesScoped"
+    effect = "Allow"
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreatePolicy",
+      "iam:CreatePolicyVersion",
+      "iam:CreateRole",
+      "iam:DeletePolicy",
+      "iam:DeletePolicyVersion",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:PutRolePolicy",
+      "iam:TagPolicy",
+      "iam:TagRole",
+      "iam:UntagPolicy",
+      "iam:UntagRole",
+      "iam:UpdateAssumeRolePolicy",
+      "iam:UpdateRole",
+      "iam:UpdateRoleDescription",
+    ]
+    resources = [
+      "arn:aws:iam::*:policy/${var.transform_agents_prefix}-*",
+      "arn:aws:iam::*:role/${var.transform_agents_prefix}-*",
+    ]
+  }
+
+  statement {
+    sid       = "TransformAgentsPassRole"
+    effect    = "Allow"
+    actions   = ["iam:PassRole"]
+    resources = ["arn:aws:iam::*:role/${var.transform_agents_prefix}-*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values = [
+        "bedrock-agentcore.amazonaws.com",
+        "bedrock.amazonaws.com",
+        "lambda.amazonaws.com",
+        "scheduler.amazonaws.com",
+      ]
+    }
+  }
+
+  statement {
+    sid       = "TransformAgentsServiceLinkedRoles"
+    effect    = "Allow"
+    actions   = ["iam:CreateServiceLinkedRole"]
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:AWSServiceName"
+      values = [
+        "application-migration.amazonaws.com",
+        "scheduler.amazonaws.com",
       ]
     }
   }
