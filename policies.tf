@@ -1251,6 +1251,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
       "mgn:Get*",
       "mgn:InitializeService",
       "mgn:List*",
+      "mgn:Create*"
     ]
     resources = ["*"]
   }
