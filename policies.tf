@@ -1197,6 +1197,17 @@ data "aws_iam_policy_document" "partner_demo_access" {
     ]
   }
 
+  # Transform containers poc
+  statement {
+    sid     = "TransformContainerPoc"
+    effect  = "Allow"
+    actions = ["secretsmanager:*", "iam:*"]
+    resources = [
+      "arn:aws:secretsmanager:*:*:secret:${var.transform_container_prefix}-*",
+      "arn:aws:iam::*:role/${var.transform_container_prefix}-*",
+    ]
+  }
+
   # transform-agents PoC. Invoke Bedrock and run its own DynamoDB / Lambda / ECR
   # / AgentCore / Scheduler / S3 / Budgets stack, scoped to
   # transform_agents_prefix-*. logs, cloudwatch and ssm are already covered by
