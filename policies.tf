@@ -1916,21 +1916,10 @@ data "aws_iam_policy_document" "ai_governance" {
 
 # Used by: EdgeAIAccess.
 #
-# Edge AI Landing Zone pilot (EPAM proposal, Aug 2026 - see the deck this was
-# built from): govern model delivery, fleet control and inference
-# observability for edge/IoT devices this org does not manage directly.
-# Everything this stack creates is scoped to var.edge_ai_prefix, the same
-# pattern as the transform-agents and transform-containers PoCs below.
-#
-# This is a first pass covering the six-capability reference architecture from
-# the proposal (connect/digitize, store/structure, segment/understand,
-# simulate/train, deploy/manage, infer/operate at the edge). Some services
-# generate IDs Terraform cannot predict before the first apply (Greengrass
-# deployment IDs, Managed Grafana workspace IDs, Neptune's Data API resource
-# ID), so those statements are scoped as narrowly as the ARN allows and no
-# narrower - same trade-off partner_demo_access already makes for AgentCore and
-# mgn's bootstrap roles. Expect this to grow via follow-up PRs the way every
-# other set here did.
+# Edge AI Landing Zone pilot: model delivery, fleet control and inference
+# observability for edge/IoT devices. Everything it creates is scoped to
+# var.edge_ai_prefix. First pass over a large proposal - expect follow-up PRs,
+# like every other set in this file.
 data "aws_iam_policy_document" "edge_ai_access" {
   # Without this the console header cannot render the signed-in account.
   statement {
@@ -1940,9 +1929,7 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["*"]
   }
 
-  # Discovery across all six capabilities: what silicon, runtimes and control
-  # plane already exist, before anything is created. Mirrors the shape of
-  # DevOpsAgentAccess's InfrastructureDiagnosisReadOnly.
+  # Read-only discovery across everything this set touches.
   statement {
     sid    = "EdgeAIReadOnly"
     effect = "Allow"
@@ -1992,15 +1979,8 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["*"]
   }
 
-  # Capability 1, connect and digitize: things, thing groups, jobs and rules,
-  # scoped by name. Create actions on iot:Thing/ThingGroup/Job/TopicRule all
-  # support resource-level ARNs, unlike most of the iot: namespace, which is
-  # why this is an enumerated list rather than iot:* like the scoped
-  # statements below - iot:* here would silently do nothing for the actions
-  # that require resource "*".
-  #
-  # Rule names cannot contain hyphens, so anything created under this set uses
-  # an underscore form of the prefix for rules specifically.
+  # Not iot:*: most iot: actions don't support resource-level ARNs, only
+  # Thing/ThingGroup/Job/Rule do. Rule names can't contain hyphens.
   statement {
     sid    = "EdgeAIThingsJobsAndRules"
     effect = "Allow"
@@ -2041,9 +2021,7 @@ data "aws_iam_policy_document" "edge_ai_access" {
     ]
   }
 
-  # IoT SiteWise assets and models are ID-based once created, not name-based,
-  # so Create* needs resource "*". Contained by the region lockdown and the
-  # Sandbox-only grant, like partner_demo_access's AgentCore statements.
+  # Asset/model/stream IDs are generated, not name-based - can't prefix-scope.
   statement {
     sid    = "EdgeAISiteWiseAndVideo"
     effect = "Allow"
@@ -2066,8 +2044,7 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["*"]
   }
 
-  # Device Defender audit configuration is account-level, not per-thing, so
-  # this cannot be prefix-scoped.
+  # Account-level, not per-thing - can't be scoped further.
   statement {
     sid    = "EdgeAIDeviceDefender"
     effect = "Allow"
@@ -2082,12 +2059,7 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["*"]
   }
 
-  # Capability 5/6, deploy and infer at the edge: the Greengrass agent this
-  # runs on equipment. Component ARNs and core-device ARNs are name-based
-  # (core device name is the underlying IoT thing name), so both scope by
-  # prefix. Deployment IDs are generated at creation and cannot be predicted,
-  # so those two actions need resource "*" - same trade-off as mgn's wave
-  # operations in partner_demo_access.
+  # Greengrass component and core-device ARNs are name-based.
   statement {
     sid    = "EdgeAIFleetDeploy"
     effect = "Allow"
@@ -2110,6 +2082,7 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["arn:aws:greengrass:*:*:coreDevices:${var.edge_ai_prefix}-*"]
   }
 
+  # Deployment IDs are generated at creation - can't be scoped up front.
   statement {
     sid    = "EdgeAIFleetDeployments"
     effect = "Allow"
@@ -2120,9 +2093,7 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["*"]
   }
 
-  # Patch Manager baselines and maintenance windows are the "patcheo" half of
-  # the deck's "Secrets - Device Defender - parcheo - cumplimiento" line.
-  # Resource-level ARNs here are ID-based, not name-based.
+  # Patch baseline/window IDs are generated - stays account-wide.
   statement {
     sid    = "EdgeAIPatching"
     effect = "Allow"
@@ -2157,10 +2128,6 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["arn:aws:secretsmanager:*:*:secret:${var.edge_ai_prefix}-*"]
   }
 
-  # Capability 2, store and structure: the artifact bucket, business-data
-  # buckets and DynamoDB. Collapsed to service:* on the prefix-scoped
-  # resource, the same trade already made by TransformAgentsTables and
-  # TransformAgentsBuckets, to stay under the inline-policy byte cap.
   statement {
     sid     = "EdgeAIBuckets"
     effect  = "Allow"
@@ -2178,12 +2145,7 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["arn:aws:dynamodb:*:*:table/${var.edge_ai_prefix}-*"]
   }
 
-  # Capability 2/3, Aurora and Neptune both run on the RDS control plane.
-  # Cluster and instance ARNs are name-based; the Neptune graph Data API
-  # (neptune-db:*) addresses a generated cluster-resource-id instead, so it
-  # cannot be prefix-scoped until the cluster exists - added here with
-  # resources "*", to be tightened to the specific resource ID once the first
-  # cluster is provisioned.
+  # Aurora and Neptune share the RDS control plane; ARNs are name-based.
   statement {
     sid    = "EdgeAIRelationalAndGraph"
     effect = "Allow"
@@ -2204,6 +2166,8 @@ data "aws_iam_policy_document" "edge_ai_access" {
     ]
   }
 
+  # Neptune's Data API addresses a generated resource ID, not a name - can't
+  # prefix-scope until the cluster exists.
   statement {
     sid    = "EdgeAIGraphQuery"
     effect = "Allow"
@@ -2216,9 +2180,7 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["*"]
   }
 
-  # Capability 3, segment and understand: Glue jobs and crawlers building the
-  # knowledge graph's inputs. The catalog resource is required alongside the
-  # named resource for most Glue calls, and is account-wide by design.
+  # The catalog resource is required alongside the named one for most Glue calls.
   statement {
     sid    = "EdgeAIAnalytics"
     effect = "Allow"
@@ -2249,9 +2211,6 @@ data "aws_iam_policy_document" "edge_ai_access" {
     ]
   }
 
-  # Capability 4, simulate and train: SageMaker training jobs, models and the
-  # endpoints that back retraining. Batch and EKS cover the heavier simulation
-  # workloads. All four support name-based resource ARNs.
   statement {
     sid    = "EdgeAITrain"
     effect = "Allow"
@@ -2307,9 +2266,6 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["arn:aws:eks:*:*:cluster/${var.edge_ai_prefix}-*"]
   }
 
-  # Model artifact registry (the "artefacto verificable" that has to arrive
-  # signed) and the controller Lambda that evaluates gates and promotes or
-  # rolls back. Collapsed to service:* on the prefix, same as EdgeAIBuckets.
   statement {
     sid       = "EdgeAIEcrAuth"
     effect    = "Allow"
@@ -2331,10 +2287,6 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["arn:aws:lambda:*:*:function:${var.edge_ai_prefix}-*"]
   }
 
-  # Capability 4's observability half: the inference-event contract
-  # (Timestream), the business-data path (Firehose) and the dashboards that
-  # read both (CloudWatch, Managed Grafana). Grafana workspace ARNs are
-  # ID-based, so that statement is account-wide like EdgeAISiteWiseAndVideo.
   statement {
     sid    = "EdgeAIEventStream"
     effect = "Allow"
@@ -2383,6 +2335,7 @@ data "aws_iam_policy_document" "edge_ai_access" {
     ]
   }
 
+  # Workspace IDs are generated - stays account-wide.
   statement {
     sid    = "EdgeAIDashboards"
     effect = "Allow"
@@ -2412,9 +2365,6 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["arn:aws:logs:*:*:log-group:/${var.edge_ai_prefix}/*"]
   }
 
-  # Roles this pilot's own services assume: the Greengrass token-exchange
-  # role, Lambda controller, SageMaker execution role, Glue job role, Batch
-  # instance role and EKS node role. Path-scoped like DevOpsAgentIamWriteScoped.
   statement {
     sid    = "EdgeAIIamRead"
     effect = "Allow"
@@ -2425,6 +2375,7 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["*"]
   }
 
+  # Roles this pilot's own services assume, scoped by prefix.
   statement {
     sid    = "EdgeAIIamWriteScoped"
     effect = "Allow"

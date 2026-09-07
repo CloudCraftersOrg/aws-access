@@ -75,10 +75,7 @@ variable "permission_sets" {
         "us-east-1", "us-east-2", "us-west-1", "us-west-2",
       ]
     }
-    # Edge AI Landing Zone pilot (EPAM proposal, Aug 2026): model delivery,
-    # fleet control and inference observability for devices this org does not
-    # manage directly. No allowed_regions override, so it is capped to
-    # var.region like most sets; widen it if the pilot needs another region.
+    # Edge AI Landing Zone pilot. No allowed_regions override, so it's capped to var.region.
     EdgeAIAccess = {
       description       = "Edge AI Landing Zone pilot: govern model delivery, fleet control and inference observability for edge/IoT devices"
       inline_policy_key = "edge_ai_access"
@@ -147,8 +144,7 @@ variable "grants" {
       DevOpsAgent    = ["DevOpsAgentAccess"]
       AWSTransform   = ["AWSTransformAccess"]
       AIGovernance   = ["AIGovernance"]
-      # EdgeAI must exist as an Identity Center group in the base repo before
-      # this grant resolves - see lookups.tf's granted_groups check.
+      # EdgeAI group must already exist in the base repo.
       EdgeAI         = ["EdgeAIAccess"]
     }
   }
@@ -218,10 +214,7 @@ variable "transform_container_prefix" {
 }
 
 
-# Resource name prefix scoping the Edge AI Landing Zone pilot's IoT, storage,
-# compute and IAM access (IoT things/jobs/rules, Greengrass core devices, S3,
-# DynamoDB, Glue, SageMaker, Batch, EKS, ECR, Lambda, Firehose, Timestream,
-# CloudWatch and IAM roles), in the edge_ai_access document.
+# Resource name prefix for the Edge AI Landing Zone pilot's resources.
 variable "edge_ai_prefix" {
   type        = string
   description = "Resource name prefix for the Edge AI Landing Zone pilot."
