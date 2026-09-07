@@ -68,39 +68,14 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["*"]
   }
 
-  # Not iot:*: most iot: actions don't support resource-level ARNs, only
-  # Thing/ThingGroup/Job/Rule do. Rule names can't contain hyphens.
+  # iot:* rather than the enumerated verb list: only Thing/ThingGroup/Job/
+  # Rule/Policy actions support resource-level ARNs, so the five scoped
+  # resources below already contain this statement. Rule names can't contain
+  # hyphens. Collapsed to stay under the 10,240-byte inline policy cap.
   statement {
-    sid    = "EdgeAIThingsJobsAndRules"
-    effect = "Allow"
-    actions = [
-      "iot:AddThingToThingGroup",
-      "iot:AttachPolicy",
-      "iot:AttachThingPrincipal",
-      "iot:CancelJob",
-      "iot:CreateJob",
-      "iot:CreatePolicy",
-      "iot:CreateThing",
-      "iot:CreateThingGroup",
-      "iot:CreateTopicRule",
-      "iot:DeleteJob",
-      "iot:DeletePolicy",
-      "iot:DeleteThing",
-      "iot:DeleteThingGroup",
-      "iot:DeleteThingShadow",
-      "iot:DeleteTopicRule",
-      "iot:DetachPolicy",
-      "iot:DetachThingPrincipal",
-      "iot:GetThingShadow",
-      "iot:RemoveThingFromThingGroup",
-      "iot:ReplaceTopicRule",
-      "iot:TagResource",
-      "iot:UntagResource",
-      "iot:UpdateJob",
-      "iot:UpdateThing",
-      "iot:UpdateThingGroup",
-      "iot:UpdateThingShadow",
-    ]
+    sid       = "EdgeAIThingsJobsAndRules"
+    effect    = "Allow"
+    actions   = ["iot:*"]
     resources = [
       "arn:aws:iot:*:*:job/${var.edge_ai_prefix}-*",
       "arn:aws:iot:*:*:policy/${var.edge_ai_prefix}-*",
@@ -269,28 +244,12 @@ data "aws_iam_policy_document" "edge_ai_access" {
     resources = ["*"]
   }
 
-  # The catalog resource is required alongside the named one for most Glue calls.
+  # The catalog resource is required alongside the named one for most Glue
+  # calls. Collapsed to glue:* to stay under the 10,240-byte inline policy cap.
   statement {
-    sid    = "EdgeAIAnalytics"
-    effect = "Allow"
-    actions = [
-      "glue:BatchDeleteTable",
-      "glue:CreateCrawler",
-      "glue:CreateDatabase",
-      "glue:CreateJob",
-      "glue:CreateTable",
-      "glue:DeleteCrawler",
-      "glue:DeleteDatabase",
-      "glue:DeleteJob",
-      "glue:DeleteTable",
-      "glue:StartCrawler",
-      "glue:StartJobRun",
-      "glue:TagResource",
-      "glue:UpdateCrawler",
-      "glue:UpdateDatabase",
-      "glue:UpdateJob",
-      "glue:UpdateTable",
-    ]
+    sid       = "EdgeAIAnalytics"
+    effect    = "Allow"
+    actions   = ["glue:*"]
     resources = [
       "arn:aws:glue:*:*:catalog",
       "arn:aws:glue:*:*:crawler/${var.edge_ai_prefix}-*",
@@ -300,23 +259,11 @@ data "aws_iam_policy_document" "edge_ai_access" {
     ]
   }
 
+  # Collapsed to sagemaker:* to stay under the 10,240-byte inline policy cap.
   statement {
-    sid    = "EdgeAITrain"
-    effect = "Allow"
-    actions = [
-      "sagemaker:AddTags",
-      "sagemaker:CreateEndpoint",
-      "sagemaker:CreateEndpointConfig",
-      "sagemaker:CreateModel",
-      "sagemaker:CreateTrainingJob",
-      "sagemaker:DeleteEndpoint",
-      "sagemaker:DeleteEndpointConfig",
-      "sagemaker:DeleteModel",
-      "sagemaker:DeleteTags",
-      "sagemaker:InvokeEndpoint",
-      "sagemaker:StopTrainingJob",
-      "sagemaker:UpdateEndpoint",
-    ]
+    sid       = "EdgeAITrain"
+    effect    = "Allow"
+    actions   = ["sagemaker:*"]
     resources = [
       "arn:aws:sagemaker:*:*:endpoint-config/${var.edge_ai_prefix}-*",
       "arn:aws:sagemaker:*:*:endpoint/${var.edge_ai_prefix}-*",
