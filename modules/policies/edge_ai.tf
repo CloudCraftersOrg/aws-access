@@ -73,9 +73,9 @@ data "aws_iam_policy_document" "edge_ai_access" {
   # resources below already contain this statement. Rule names can't contain
   # hyphens. Collapsed to stay under the 10,240-byte inline policy cap.
   statement {
-    sid       = "EdgeAIThingsJobsAndRules"
-    effect    = "Allow"
-    actions   = ["iot:*"]
+    sid     = "EdgeAIThingsJobsAndRules"
+    effect  = "Allow"
+    actions = ["iot:*"]
     resources = [
       "arn:aws:iot:*:*:job/${var.edge_ai_prefix}-*",
       "arn:aws:iot:*:*:policy/${var.edge_ai_prefix}-*",
@@ -247,9 +247,9 @@ data "aws_iam_policy_document" "edge_ai_access" {
   # The catalog resource is required alongside the named one for most Glue
   # calls. Collapsed to glue:* to stay under the 10,240-byte inline policy cap.
   statement {
-    sid       = "EdgeAIAnalytics"
-    effect    = "Allow"
-    actions   = ["glue:*"]
+    sid     = "EdgeAIAnalytics"
+    effect  = "Allow"
+    actions = ["glue:*"]
     resources = [
       "arn:aws:glue:*:*:catalog",
       "arn:aws:glue:*:*:crawler/${var.edge_ai_prefix}-*",
@@ -261,9 +261,9 @@ data "aws_iam_policy_document" "edge_ai_access" {
 
   # Collapsed to sagemaker:* to stay under the 10,240-byte inline policy cap.
   statement {
-    sid       = "EdgeAITrain"
-    effect    = "Allow"
-    actions   = ["sagemaker:*"]
+    sid     = "EdgeAITrain"
+    effect  = "Allow"
+    actions = ["sagemaker:*"]
     resources = [
       "arn:aws:sagemaker:*:*:endpoint-config/${var.edge_ai_prefix}-*",
       "arn:aws:sagemaker:*:*:endpoint/${var.edge_ai_prefix}-*",
