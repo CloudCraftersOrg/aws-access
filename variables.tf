@@ -197,3 +197,11 @@ variable "transform_agents_prefix" {
   description = "Resource name prefix for the transform-agents PoC stack."
   default     = "transform-agents"
 }
+
+# Prefix the transform-containers PoC stack's Secrets Manager, IAM and security
+# group access is scoped to, in the partner_demo_access document.
+variable "transform_container_prefix" {
+  type        = string
+  description = "Resource name prefix for the ECS containers PoC stack."
+  default     = "transform-containers"
+}
