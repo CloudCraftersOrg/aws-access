@@ -12,6 +12,7 @@
 #   DevOpsAgentAccess     devops_agent_access              this file
 #   AWSTransformAccess    partner_demo_access              this file
 #   AIGovernance          ai_governance                    this file
+#   EdgeAIAccess          edge_ai_access                    this file
 #
 # Read that table rather than trusting the names. They do not line up: the keys
 # here are snake_case while the sets are PascalCase, `PowerUserAccess` is a
@@ -52,6 +53,7 @@ locals {
     devops_agent_access = data.aws_iam_policy_document.devops_agent_access.json # DevOpsAgentAccess
     partner_demo_access = data.aws_iam_policy_document.partner_demo_access.json # AWSTransformAccess
     ai_governance       = data.aws_iam_policy_document.ai_governance.json       # AIGovernance
+    edge_ai_access      = data.aws_iam_policy_document.edge_ai_access.json      # EdgeAIAccess
   }
 }
 
@@ -1907,6 +1909,596 @@ data "aws_iam_policy_document" "ai_governance" {
         "bedrock.*.amazonaws.com",
         "logs.*.amazonaws.com",
         "s3.*.amazonaws.com",
+      ]
+    }
+  }
+}
+
+# Used by: EdgeAIAccess.
+#
+# Edge AI Landing Zone pilot (EPAM proposal, Aug 2026 - see the deck this was
+# built from): govern model delivery, fleet control and inference
+# observability for edge/IoT devices this org does not manage directly.
+# Everything this stack creates is scoped to var.edge_ai_prefix, the same
+# pattern as the transform-agents and transform-containers PoCs below.
+#
+# This is a first pass covering the six-capability reference architecture from
+# the proposal (connect/digitize, store/structure, segment/understand,
+# simulate/train, deploy/manage, infer/operate at the edge). Some services
+# generate IDs Terraform cannot predict before the first apply (Greengrass
+# deployment IDs, Managed Grafana workspace IDs, Neptune's Data API resource
+# ID), so those statements are scoped as narrowly as the ARN allows and no
+# narrower - same trade-off partner_demo_access already makes for AgentCore and
+# mgn's bootstrap roles. Expect this to grow via follow-up PRs the way every
+# other set here did.
+data "aws_iam_policy_document" "edge_ai_access" {
+  # Without this the console header cannot render the signed-in account.
+  statement {
+    sid       = "ConsoleBaseline"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+
+  # Discovery across all six capabilities: what silicon, runtimes and control
+  # plane already exist, before anything is created. Mirrors the shape of
+  # DevOpsAgentAccess's InfrastructureDiagnosisReadOnly.
+  statement {
+    sid    = "EdgeAIReadOnly"
+    effect = "Allow"
+    actions = [
+      "batch:Describe*",
+      "batch:List*",
+      "cloudwatch:Describe*",
+      "cloudwatch:Get*",
+      "cloudwatch:List*",
+      "dynamodb:Describe*",
+      "dynamodb:List*",
+      "ecr:Describe*",
+      "ecr:Get*",
+      "ecr:List*",
+      "eks:Describe*",
+      "eks:List*",
+      "firehose:Describe*",
+      "firehose:List*",
+      "glue:Get*",
+      "glue:List*",
+      "grafana:Describe*",
+      "grafana:List*",
+      "greengrass:Get*",
+      "greengrass:List*",
+      "iot:Describe*",
+      "iot:Get*",
+      "iot:List*",
+      "iot:SearchIndex",
+      "iotsitewise:Describe*",
+      "iotsitewise:List*",
+      "kinesisvideo:Describe*",
+      "kinesisvideo:List*",
+      "logs:Describe*",
+      "logs:FilterLogEvents",
+      "logs:Get*",
+      "logs:List*",
+      "neptune-db:GetEngineStatus",
+      "rds:Describe*",
+      "rds:List*",
+      "sagemaker:Describe*",
+      "sagemaker:List*",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecrets",
+      "timestream:Describe*",
+      "timestream:List*",
+    ]
+    resources = ["*"]
+  }
+
+  # Capability 1, connect and digitize: things, thing groups, jobs and rules,
+  # scoped by name. Create actions on iot:Thing/ThingGroup/Job/TopicRule all
+  # support resource-level ARNs, unlike most of the iot: namespace, which is
+  # why this is an enumerated list rather than iot:* like the scoped
+  # statements below - iot:* here would silently do nothing for the actions
+  # that require resource "*".
+  #
+  # Rule names cannot contain hyphens, so anything created under this set uses
+  # an underscore form of the prefix for rules specifically.
+  statement {
+    sid    = "EdgeAIThingsJobsAndRules"
+    effect = "Allow"
+    actions = [
+      "iot:AddThingToThingGroup",
+      "iot:AttachPolicy",
+      "iot:AttachThingPrincipal",
+      "iot:CancelJob",
+      "iot:CreateJob",
+      "iot:CreatePolicy",
+      "iot:CreateThing",
+      "iot:CreateThingGroup",
+      "iot:CreateTopicRule",
+      "iot:DeleteJob",
+      "iot:DeletePolicy",
+      "iot:DeleteThing",
+      "iot:DeleteThingGroup",
+      "iot:DeleteThingShadow",
+      "iot:DeleteTopicRule",
+      "iot:DetachPolicy",
+      "iot:DetachThingPrincipal",
+      "iot:GetThingShadow",
+      "iot:RemoveThingFromThingGroup",
+      "iot:ReplaceTopicRule",
+      "iot:TagResource",
+      "iot:UntagResource",
+      "iot:UpdateJob",
+      "iot:UpdateThing",
+      "iot:UpdateThingGroup",
+      "iot:UpdateThingShadow",
+    ]
+    resources = [
+      "arn:aws:iot:*:*:job/${var.edge_ai_prefix}-*",
+      "arn:aws:iot:*:*:policy/${var.edge_ai_prefix}-*",
+      "arn:aws:iot:*:*:rule/${replace(var.edge_ai_prefix, "-", "_")}_*",
+      "arn:aws:iot:*:*:thing/${var.edge_ai_prefix}-*",
+      "arn:aws:iot:*:*:thinggroup/${var.edge_ai_prefix}-*",
+    ]
+  }
+
+  # IoT SiteWise assets and models are ID-based once created, not name-based,
+  # so Create* needs resource "*". Contained by the region lockdown and the
+  # Sandbox-only grant, like partner_demo_access's AgentCore statements.
+  statement {
+    sid    = "EdgeAISiteWiseAndVideo"
+    effect = "Allow"
+    actions = [
+      "iotsitewise:BatchPutAssetPropertyValue",
+      "iotsitewise:CreateAsset",
+      "iotsitewise:CreateAssetModel",
+      "iotsitewise:DeleteAsset",
+      "iotsitewise:DeleteAssetModel",
+      "iotsitewise:GetAssetPropertyValue",
+      "iotsitewise:TagResource",
+      "iotsitewise:UpdateAsset",
+      "iotsitewise:UpdateAssetModel",
+      "kinesisvideo:CreateStream",
+      "kinesisvideo:DeleteStream",
+      "kinesisvideo:GetDataEndpoint",
+      "kinesisvideo:TagStream",
+      "kinesisvideo:UpdateStream",
+    ]
+    resources = ["*"]
+  }
+
+  # Device Defender audit configuration is account-level, not per-thing, so
+  # this cannot be prefix-scoped.
+  statement {
+    sid    = "EdgeAIDeviceDefender"
+    effect = "Allow"
+    actions = [
+      "iot:AttachSecurityProfile",
+      "iot:CreateSecurityProfile",
+      "iot:ListAuditFindings",
+      "iot:StartAuditTask",
+      "iot:UpdateAccountAuditConfiguration",
+      "iot:UpdateSecurityProfile",
+    ]
+    resources = ["*"]
+  }
+
+  # Capability 5/6, deploy and infer at the edge: the Greengrass agent this
+  # runs on equipment. Component ARNs and core-device ARNs are name-based
+  # (core device name is the underlying IoT thing name), so both scope by
+  # prefix. Deployment IDs are generated at creation and cannot be predicted,
+  # so those two actions need resource "*" - same trade-off as mgn's wave
+  # operations in partner_demo_access.
+  statement {
+    sid    = "EdgeAIFleetDeploy"
+    effect = "Allow"
+    actions = [
+      "greengrass:CreateComponentVersion",
+      "greengrass:DeleteComponent",
+      "greengrass:TagResource",
+    ]
+    resources = ["arn:aws:greengrass:*:*:components:${var.edge_ai_prefix}-*"]
+  }
+
+  statement {
+    sid    = "EdgeAIFleetCoreDevices"
+    effect = "Allow"
+    actions = [
+      "greengrass:BatchAssociateClientDeviceWithCoreDevice",
+      "greengrass:BatchDisassociateClientDeviceWithCoreDevice",
+      "greengrass:DeleteCoreDevice",
+    ]
+    resources = ["arn:aws:greengrass:*:*:coreDevices:${var.edge_ai_prefix}-*"]
+  }
+
+  statement {
+    sid    = "EdgeAIFleetDeployments"
+    effect = "Allow"
+    actions = [
+      "greengrass:CancelDeployment",
+      "greengrass:CreateDeployment",
+    ]
+    resources = ["*"]
+  }
+
+  # Patch Manager baselines and maintenance windows are the "patcheo" half of
+  # the deck's "Secrets - Device Defender - parcheo - cumplimiento" line.
+  # Resource-level ARNs here are ID-based, not name-based.
+  statement {
+    sid    = "EdgeAIPatching"
+    effect = "Allow"
+    actions = [
+      "ssm:CreateMaintenanceWindow",
+      "ssm:CreatePatchBaseline",
+      "ssm:DeletePatchBaseline",
+      "ssm:DeregisterPatchBaselineForPatchGroup",
+      "ssm:RegisterPatchBaselineForPatchGroup",
+      "ssm:RegisterTargetWithMaintenanceWindow",
+      "ssm:RegisterTaskWithMaintenanceWindow",
+      "ssm:SendCommand",
+      "ssm:UpdateMaintenanceWindow",
+      "ssm:UpdatePatchBaseline",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "EdgeAISecrets"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:CreateSecret",
+      "secretsmanager:DeleteSecret",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:PutSecretValue",
+      "secretsmanager:RestoreSecret",
+      "secretsmanager:TagResource",
+      "secretsmanager:UntagResource",
+      "secretsmanager:UpdateSecret",
+    ]
+    resources = ["arn:aws:secretsmanager:*:*:secret:${var.edge_ai_prefix}-*"]
+  }
+
+  # Capability 2, store and structure: the artifact bucket, business-data
+  # buckets and DynamoDB. Collapsed to service:* on the prefix-scoped
+  # resource, the same trade already made by TransformAgentsTables and
+  # TransformAgentsBuckets, to stay under the inline-policy byte cap.
+  statement {
+    sid     = "EdgeAIBuckets"
+    effect  = "Allow"
+    actions = ["s3:*"]
+    resources = [
+      "arn:aws:s3:::${var.edge_ai_prefix}-*",
+      "arn:aws:s3:::${var.edge_ai_prefix}-*/*",
+    ]
+  }
+
+  statement {
+    sid       = "EdgeAITables"
+    effect    = "Allow"
+    actions   = ["dynamodb:*"]
+    resources = ["arn:aws:dynamodb:*:*:table/${var.edge_ai_prefix}-*"]
+  }
+
+  # Capability 2/3, Aurora and Neptune both run on the RDS control plane.
+  # Cluster and instance ARNs are name-based; the Neptune graph Data API
+  # (neptune-db:*) addresses a generated cluster-resource-id instead, so it
+  # cannot be prefix-scoped until the cluster exists - added here with
+  # resources "*", to be tightened to the specific resource ID once the first
+  # cluster is provisioned.
+  statement {
+    sid    = "EdgeAIRelationalAndGraph"
+    effect = "Allow"
+    actions = [
+      "rds:AddTagsToResource",
+      "rds:CreateDBCluster",
+      "rds:CreateDBInstance",
+      "rds:DeleteDBCluster",
+      "rds:DeleteDBInstance",
+      "rds:ModifyDBCluster",
+      "rds:ModifyDBInstance",
+      "rds:RemoveTagsFromResource",
+    ]
+    resources = [
+      "arn:aws:rds:*:*:cluster:${var.edge_ai_prefix}-*",
+      "arn:aws:rds:*:*:db:${var.edge_ai_prefix}-*",
+      "arn:aws:rds:*:*:subgrp:${var.edge_ai_prefix}-*",
+    ]
+  }
+
+  statement {
+    sid    = "EdgeAIGraphQuery"
+    effect = "Allow"
+    actions = [
+      "neptune-db:DeleteDataViaQuery",
+      "neptune-db:ReadDataViaQuery",
+      "neptune-db:WriteDataViaQuery",
+      "neptune-db:connect",
+    ]
+    resources = ["*"]
+  }
+
+  # Capability 3, segment and understand: Glue jobs and crawlers building the
+  # knowledge graph's inputs. The catalog resource is required alongside the
+  # named resource for most Glue calls, and is account-wide by design.
+  statement {
+    sid    = "EdgeAIAnalytics"
+    effect = "Allow"
+    actions = [
+      "glue:BatchDeleteTable",
+      "glue:CreateCrawler",
+      "glue:CreateDatabase",
+      "glue:CreateJob",
+      "glue:CreateTable",
+      "glue:DeleteCrawler",
+      "glue:DeleteDatabase",
+      "glue:DeleteJob",
+      "glue:DeleteTable",
+      "glue:StartCrawler",
+      "glue:StartJobRun",
+      "glue:TagResource",
+      "glue:UpdateCrawler",
+      "glue:UpdateDatabase",
+      "glue:UpdateJob",
+      "glue:UpdateTable",
+    ]
+    resources = [
+      "arn:aws:glue:*:*:catalog",
+      "arn:aws:glue:*:*:crawler/${var.edge_ai_prefix}-*",
+      "arn:aws:glue:*:*:database/${var.edge_ai_prefix}-*",
+      "arn:aws:glue:*:*:job/${var.edge_ai_prefix}-*",
+      "arn:aws:glue:*:*:table/${var.edge_ai_prefix}-*/*",
+    ]
+  }
+
+  # Capability 4, simulate and train: SageMaker training jobs, models and the
+  # endpoints that back retraining. Batch and EKS cover the heavier simulation
+  # workloads. All four support name-based resource ARNs.
+  statement {
+    sid    = "EdgeAITrain"
+    effect = "Allow"
+    actions = [
+      "sagemaker:AddTags",
+      "sagemaker:CreateEndpoint",
+      "sagemaker:CreateEndpointConfig",
+      "sagemaker:CreateModel",
+      "sagemaker:CreateTrainingJob",
+      "sagemaker:DeleteEndpoint",
+      "sagemaker:DeleteEndpointConfig",
+      "sagemaker:DeleteModel",
+      "sagemaker:DeleteTags",
+      "sagemaker:InvokeEndpoint",
+      "sagemaker:StopTrainingJob",
+      "sagemaker:UpdateEndpoint",
+    ]
+    resources = [
+      "arn:aws:sagemaker:*:*:endpoint-config/${var.edge_ai_prefix}-*",
+      "arn:aws:sagemaker:*:*:endpoint/${var.edge_ai_prefix}-*",
+      "arn:aws:sagemaker:*:*:model/${var.edge_ai_prefix}-*",
+      "arn:aws:sagemaker:*:*:training-job/${var.edge_ai_prefix}-*",
+    ]
+  }
+
+  statement {
+    sid    = "EdgeAIBatch"
+    effect = "Allow"
+    actions = [
+      "batch:CreateComputeEnvironment",
+      "batch:CreateJobQueue",
+      "batch:DeleteComputeEnvironment",
+      "batch:DeleteJobQueue",
+      "batch:DeregisterJobDefinition",
+      "batch:RegisterJobDefinition",
+      "batch:SubmitJob",
+      "batch:TagResource",
+      "batch:TerminateJob",
+      "batch:UpdateComputeEnvironment",
+      "batch:UpdateJobQueue",
+    ]
+    resources = [
+      "arn:aws:batch:*:*:compute-environment/${var.edge_ai_prefix}-*",
+      "arn:aws:batch:*:*:job-definition/${var.edge_ai_prefix}-*",
+      "arn:aws:batch:*:*:job-queue/${var.edge_ai_prefix}-*",
+    ]
+  }
+
+  statement {
+    sid       = "EdgeAIEks"
+    effect    = "Allow"
+    actions   = ["eks:*"]
+    resources = ["arn:aws:eks:*:*:cluster/${var.edge_ai_prefix}-*"]
+  }
+
+  # Model artifact registry (the "artefacto verificable" that has to arrive
+  # signed) and the controller Lambda that evaluates gates and promotes or
+  # rolls back. Collapsed to service:* on the prefix, same as EdgeAIBuckets.
+  statement {
+    sid       = "EdgeAIEcrAuth"
+    effect    = "Allow"
+    actions   = ["ecr:GetAuthorizationToken"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "EdgeAIEcr"
+    effect    = "Allow"
+    actions   = ["ecr:*"]
+    resources = ["arn:aws:ecr:*:*:repository/${var.edge_ai_prefix}-*"]
+  }
+
+  statement {
+    sid       = "EdgeAIController"
+    effect    = "Allow"
+    actions   = ["lambda:*"]
+    resources = ["arn:aws:lambda:*:*:function:${var.edge_ai_prefix}-*"]
+  }
+
+  # Capability 4's observability half: the inference-event contract
+  # (Timestream), the business-data path (Firehose) and the dashboards that
+  # read both (CloudWatch, Managed Grafana). Grafana workspace ARNs are
+  # ID-based, so that statement is account-wide like EdgeAISiteWiseAndVideo.
+  statement {
+    sid    = "EdgeAIEventStream"
+    effect = "Allow"
+    actions = [
+      "firehose:CreateDeliveryStream",
+      "firehose:DeleteDeliveryStream",
+      "firehose:TagDeliveryStream",
+      "firehose:UpdateDestination",
+    ]
+    resources = ["arn:aws:firehose:*:*:deliverystream/${var.edge_ai_prefix}-*"]
+  }
+
+  statement {
+    sid    = "EdgeAITimeSeries"
+    effect = "Allow"
+    actions = [
+      "timestream:CreateDatabase",
+      "timestream:CreateTable",
+      "timestream:DeleteDatabase",
+      "timestream:DeleteTable",
+      "timestream:DescribeEndpoints",
+      "timestream:Select",
+      "timestream:UpdateTable",
+      "timestream:WriteRecords",
+    ]
+    resources = [
+      "arn:aws:timestream:*:*:database/${var.edge_ai_prefix}-*",
+      "arn:aws:timestream:*:*:database/${var.edge_ai_prefix}-*/table/*",
+    ]
+  }
+
+  statement {
+    sid    = "EdgeAIGates"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:DeleteAlarms",
+      "cloudwatch:DeleteDashboards",
+      "cloudwatch:PutDashboard",
+      "cloudwatch:PutMetricAlarm",
+      "cloudwatch:TagResource",
+      "cloudwatch:UntagResource",
+    ]
+    resources = [
+      "arn:aws:cloudwatch::*:dashboard/${var.edge_ai_prefix}-*",
+      "arn:aws:cloudwatch:*:*:alarm:${var.edge_ai_prefix}-*",
+    ]
+  }
+
+  statement {
+    sid    = "EdgeAIDashboards"
+    effect = "Allow"
+    actions = [
+      "grafana:CreateWorkspace",
+      "grafana:CreateWorkspaceApiKey",
+      "grafana:DeleteWorkspace",
+      "grafana:TagResource",
+      "grafana:UpdateWorkspace",
+      "grafana:UpdateWorkspaceConfiguration",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "EdgeAILogGroups"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:DeleteLogGroup",
+      "logs:PutLogEvents",
+      "logs:PutRetentionPolicy",
+      "logs:TagLogGroup",
+      "logs:TagResource",
+    ]
+    resources = ["arn:aws:logs:*:*:log-group:/${var.edge_ai_prefix}/*"]
+  }
+
+  # Roles this pilot's own services assume: the Greengrass token-exchange
+  # role, Lambda controller, SageMaker execution role, Glue job role, Batch
+  # instance role and EKS node role. Path-scoped like DevOpsAgentIamWriteScoped.
+  statement {
+    sid    = "EdgeAIIamRead"
+    effect = "Allow"
+    actions = [
+      "iam:Get*",
+      "iam:List*",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "EdgeAIIamWriteScoped"
+    effect = "Allow"
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreateInstanceProfile",
+      "iam:CreatePolicy",
+      "iam:CreateRole",
+      "iam:DeleteInstanceProfile",
+      "iam:DeletePolicy",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:PutRolePolicy",
+      "iam:TagInstanceProfile",
+      "iam:TagPolicy",
+      "iam:TagRole",
+      "iam:UntagInstanceProfile",
+      "iam:UntagPolicy",
+      "iam:UntagRole",
+      "iam:UpdateAssumeRolePolicy",
+      "iam:UpdateRole",
+      "iam:UpdateRoleDescription",
+    ]
+    resources = [
+      "arn:aws:iam::*:instance-profile/${var.edge_ai_prefix}-*",
+      "arn:aws:iam::*:policy/${var.edge_ai_prefix}-*",
+      "arn:aws:iam::*:role/${var.edge_ai_prefix}-*",
+    ]
+  }
+
+  statement {
+    sid     = "EdgeAIPassRole"
+    effect  = "Allow"
+    actions = ["iam:PassRole"]
+    resources = [
+      "arn:aws:iam::*:role/${var.edge_ai_prefix}-*",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values = [
+        "batch.amazonaws.com",
+        "ec2.amazonaws.com",
+        "eks.amazonaws.com",
+        "firehose.amazonaws.com",
+        "glue.amazonaws.com",
+        "grafana.amazonaws.com",
+        "greengrass.amazonaws.com",
+        "iot.amazonaws.com",
+        "lambda.amazonaws.com",
+        "rds.amazonaws.com",
+        "sagemaker.amazonaws.com",
+      ]
+    }
+  }
+
+  statement {
+    sid       = "EdgeAIServiceLinkedRoles"
+    effect    = "Allow"
+    actions   = ["iam:CreateServiceLinkedRole"]
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:AWSServiceName"
+      values = [
+        "batch.amazonaws.com",
+        "eks-nodegroup.amazonaws.com",
+        "eks.amazonaws.com",
+        "elasticloadbalancing.amazonaws.com",
+        "grafana.amazonaws.com",
+        "rds.amazonaws.com",
       ]
     }
   }
