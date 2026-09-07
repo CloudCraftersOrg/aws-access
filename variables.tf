@@ -144,8 +144,7 @@ variable "grants" {
       DevOpsAgent    = ["DevOpsAgentAccess"]
       AWSTransform   = ["AWSTransformAccess"]
       AIGovernance   = ["AIGovernance"]
-      # EdgeAI group must already exist in the base repo.
-      EdgeAI         = ["EdgeAIAccess"]
+      EdgeAI         = ["EdgeAIAccess"] # must exist as a group in the base repo first
     }
   }
 
