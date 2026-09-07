@@ -106,7 +106,7 @@ Open an issue or ask a code owner. It is not possible from here, by design.
 
 ## What exists today
 
-Six permission sets. Sessions are 8 hours except `AIGovernanceAdminAccess`,
+Seven permission sets. Sessions are 8 hours except `AIGovernanceAdminAccess`,
 which is 4. `variables.tf` is the source of truth for all of it; this table is a summary.
 
 | Permission set | Backed by | Regions |
@@ -117,10 +117,11 @@ which is 4. `variables.tf` is the source of truth for all of it; this table is a
 | `AWSTransformAccess` | inline `aws_transform_access` | `us-east-1`, `us-west-2` |
 | `DevOpsAgentAccess` | inline `devops_agent_access` | `us-east-1`, `us-west-2` |
 | `ReadOnlyAccess` | managed `ReadOnlyAccess` | `us-west-2` |
+| `EdgeAIAccess` | inline `edge_ai_access` | `us-west-2` |
 
 The inline documents are grouped by audience across `devops_agent.tf`,
-`aws_transform.tf` and `ai_governance.tf`. `local.inline_policies` in
-`locals.tf` is the mapping from set to document.
+`aws_transform.tf`, `ai_governance.tf` and `edge_ai.tf`. `local.inline_policies`
+in `locals.tf` is the mapping from set to document.
 
 Every set — including the two managed-policy ones — also gets a region lockdown
 merged into its inline policy. Global and region-agnostic services (IAM, STS,
@@ -142,6 +143,7 @@ Grants are `account name → group display name → permission set names`:
 | | `AWSTransform` | AWSTransform |
 | | `DevOpsAgent` | DevOpsAgent |
 | | `AIGovernance` | AIGovernanceAccess |
+| | `EdgeAI` | EdgeAIAccess |
 
 Only groups are ever assigned. There are no user-level assignments, by design.
 
@@ -604,7 +606,7 @@ S3-native; there is no DynamoDB table.
 
 | Name | Purpose | Default |
 |---|---|---|
-| `permission_sets` | The available access levels | the six sets above |
+| `permission_sets` | The available access levels | the seven sets above |
 | `grants` | Account name → group name → permission sets | the table above |
 | `region` | Identity Center region and the default region lockdown | `us-west-2` |
 | `demo_app_prefix` | Resource prefix scoping the demo stack | `fbctf` |
@@ -612,6 +614,7 @@ S3-native; there is no DynamoDB table.
 | `role_boundary_policy_name` | Permissions boundary required at `iam:CreateRole`, created by the base repo | `DelegatedRoleBoundary` |
 | `transform_agents_prefix` | Resource prefix scoping the transform-agents PoC | `transform-agents` |
 | `transform_container_prefix` | Resource prefix scoping the transform-containers PoC | `transform-containers` |
+| `edge_ai_prefix` | Resource prefix scoping the Edge AI Landing Zone pilot | `edge-ai` |
 
 ### Outputs
 

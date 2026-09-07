@@ -27,13 +27,14 @@
 
 locals {
   # Permission set name => policy JSON. The single source of this mapping.
-  # Documents are grouped by audience across devops_agent.tf, aws_transform.tf and
-  # ai_governance.tf.
+  # Documents are grouped by audience across devops_agent.tf, aws_transform.tf,
+  # ai_governance.tf and edge_ai.tf.
   inline_policies = {
     AIGovernanceAccess      = data.aws_iam_policy_document.ai_governance_access.json
     AIGovernanceAdminAccess = data.aws_iam_policy_document.ai_governance_admin_access.json
     AWSTransformAccess      = data.aws_iam_policy_document.aws_transform_access.json
     DevOpsAgentAccess       = data.aws_iam_policy_document.devops_agent_access.json
+    EdgeAIAccess            = data.aws_iam_policy_document.edge_ai_access.json
   }
 
   # Sets exempt from the role-creation guardrail merged into everything else.
