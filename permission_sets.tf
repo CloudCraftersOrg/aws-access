@@ -1,3 +1,21 @@
+# The permission sets themselves. Every IAM policy behind them is authored in
+# ./modules/policies, which returns one finished inline policy per set.
+#
+# The split is deliberate: this file is resource wiring, that module is policy
+# authoring. It is also why the module can be reorganized freely — it creates no
+# resources, only data sources, so nothing in it has a presence in state.
+module "policies" {
+  source = "./modules/policies"
+
+  permission_sets            = var.permission_sets
+  region                     = var.region
+  role_boundary_policy_name  = var.role_boundary_policy_name
+  demo_app_prefix            = var.demo_app_prefix
+  demo_app_region            = var.demo_app_region
+  transform_agents_prefix    = var.transform_agents_prefix
+  transform_container_prefix = var.transform_container_prefix
+}
+
 resource "aws_ssoadmin_permission_set" "this" {
   for_each = var.permission_sets
 
@@ -18,32 +36,17 @@ resource "aws_ssoadmin_managed_policy_attachment" "this" {
   managed_policy_arn = each.value.managed_policy_arn
 }
 
-# This is where a permission set and its policy actually meet. AWS SSO allows one
-# inline policy per set, so the region lockdown and the set's own document are
-# merged into a single document. compact() drops the placeholder for sets that
-# carry only a managed policy, so those still get the region restriction.
-#
-# Which document each set resolves to is the table at the top of policies.tf.
-data "aws_iam_policy_document" "permission_set_inline" {
-  for_each = var.permission_sets
-
-  source_policy_documents = compact([
-    data.aws_iam_policy_document.region_restriction[each.key].json,
-    each.value.inline_policy_key != null ? local.inline_policies[each.value.inline_policy_key] : "",
-  ])
-}
-
 resource "aws_ssoadmin_permission_set_inline_policy" "this" {
   for_each = var.permission_sets
 
   instance_arn       = local.sso_instance_arn
   permission_set_arn = aws_ssoadmin_permission_set.this[each.key].arn
-  inline_policy      = data.aws_iam_policy_document.permission_set_inline[each.key].json
+  inline_policy      = module.policies.inline_policies[each.key]
 
   # Identity Center caps a permission set's inline policy at 10,240 bytes,
-  # counting non-whitespace only, and the merged document here is easily large
-  # enough to reach it — region_restriction alone is ~600 bytes before a set's
-  # own statements. Without this the overflow surfaces as an opaque
+  # counting non-whitespace only, and the merged document is easily large enough
+  # to reach it — the region lockdown alone is ~600 bytes before a set's own
+  # statements. Without this the overflow surfaces as an opaque
   # ValidationException from PutInlinePolicyToPermissionSet at apply time, after
   # the earlier sets have already been written.
   #
@@ -52,8 +55,8 @@ resource "aws_ssoadmin_permission_set_inline_policy" "this" {
   # prefix is what contains those statements, not the verb list.
   lifecycle {
     precondition {
-      condition     = length(replace(data.aws_iam_policy_document.permission_set_inline[each.key].json, "/\\s/", "")) <= 10240
-      error_message = "Inline policy for permission set '${each.key}' is ${length(replace(data.aws_iam_policy_document.permission_set_inline[each.key].json, "/\\s/", ""))} non-whitespace bytes, over the 10240 limit."
+      condition     = length(replace(module.policies.inline_policies[each.key], "/\\s/", "")) <= 10240
+      error_message = "Inline policy for permission set '${each.key}' is ${length(replace(module.policies.inline_policies[each.key], "/\\s/", ""))} non-whitespace bytes, over the 10240 limit."
     }
   }
 }
