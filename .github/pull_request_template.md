@@ -16,7 +16,7 @@ Include the task this unblocks. If it is temporary, say when it can go.
 
 ## Changed
 
-- [ ] `policies.tf` — actions on an existing permission set
+- [ ] `policies_*.tf` — actions on an existing permission set
 - [ ] `variables.tf` → `permission_sets` — new or modified permission set
 - [ ] `variables.tf` → `grants` — a group gained or lost access on an account
 - [ ] Docs only
