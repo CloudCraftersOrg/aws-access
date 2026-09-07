@@ -58,15 +58,26 @@ real name does not have to be committed either.
 
 ### The contract is names
 
-Because the lookups match on names, **account names and group display names are
-the interface between the two repositories.** Two consequences:
+Because the lookups match on names, **account names, group display names and the
+permissions boundary name are the interface between the two repositories.**
+
+The boundary is the third entry and the newest. `var.role_boundary_policy_name`
+defaults to `DelegatedRoleBoundary`, and the permission sets that create IAM roles
+require it by ARN pattern at `iam:CreateRole`. The base repository creates it in
+every account, because this stack has no `iam:CreatePolicy` and only ever runs
+against the management account — it can neither create the policy nor reach the
+member accounts to do so.
+
+Two consequences, for all three kinds of name:
 
 1. **The base repository always goes first.** An account or group has to exist in
    AWS before you can reference it here. Reference something that does not exist
    and the run fails during lookup.
 
 2. **A rename in the base repository breaks grants here.** Coordinate it: rename
-   there, then here, in the same window.
+   there, then here, in the same window. Renaming the boundary is the worst of
+   the three: every `iam:CreateRole` in the affected sets starts failing with an
+   explicit deny, and nothing in a plan here will predict it.
 
 Two `check` blocks in `lookups.tf` explain those failures in plain language, but
 they only ever emit **warnings** — a `check` cannot fail a run. The run still
@@ -95,47 +106,68 @@ Open an issue or ask a code owner. It is not possible from here, by design.
 
 ## What exists today
 
-Six permission sets, all with an 8-hour session:
+Six permission sets. Sessions are 8 hours except `AIGovernanceAdminAccess`,
+which is 4. `variables.tf` is the source of truth for all of it; this table is a summary.
 
 | Permission set | Backed by | Regions |
 |---|---|---|
-| `AdministratorAccess` | managed `AdministratorAccess` | `us-west-2` |
+| `AdministratorAccess` | managed `AdministratorAccess` | `us-east-1`, `us-west-2` |
+| `AIGovernanceAccess` | inline `ai_governance_access` | the 8 Americas regions |
+| `AIGovernanceAdminAccess` | inline `ai_governance_admin_access` | the 8 Americas regions |
+| `AWSTransformAccess` | inline `aws_transform_access` | `us-east-1`, `us-west-2` |
+| `DevOpsAgentAccess` | inline `devops_agent_access` | `us-east-1`, `us-west-2` |
 | `ReadOnlyAccess` | managed `ReadOnlyAccess` | `us-west-2` |
-| `PowerUserAccess` | inline `power_user_access` | `us-west-2` |
-| `WorkshopOnlyAccess` | inline `infra_modify_only` | `us-west-2` |
-| `AWSTransformAccess` | inline `partner_demo_access` | `us-west-2`, `us-east-1` |
-| `AIGovernance` | inline `ai_governance` | `us-west-2`, `us-east-1` |
+
+The inline documents are grouped by audience across `devops_agent.tf`,
+`aws_transform.tf` and `ai_governance.tf`. `local.inline_policies` in
+`locals.tf` is the mapping from set to document.
 
 Every set — including the two managed-policy ones — also gets a region lockdown
 merged into its inline policy. Global and region-agnostic services (IAM, STS,
 Organizations, billing, Route 53, CloudFront, WAF, Support and others) are
 exempted, or console sign-in would break everywhere.
 
-> `PowerUserAccess` here is **not** the AWS managed `PowerUserAccess` policy. It
-> is a read-only observability set whose only non-read action is invoking a
-> deployed agent runtime. The name is historical and misleading; read
-> `policies.tf` before assuming what it grants.
->
-> `WorkshopOnlyAccess` is read plus update and tag, never create or destroy, with
-> an explicit `Deny` on roughly 35 `Create*`/`Delete*` actions as a second layer.
 
 Grants are `account name → group display name → permission set names`:
 
 | Account | Group | Sets |
 |---|---|---|
-| `management` | `Administrators` | Administrator, PowerUser, ReadOnly |
-| `Development` | `Administrators` | Administrator, PowerUser, ReadOnly |
-| | `Developers` | PowerUser |
-| | `InfraModifiers` | WorkshopOnly |
-| `Production` | `Administrators` | Administrator, PowerUser, ReadOnly |
-| | `Developers` | PowerUser |
-| | `InfraModifiers` | WorkshopOnly |
+| `management` | `Administrators` | Administrator, ReadOnly |
+| | `AIGovernance` | AIGovernanceAdminAccess |
+| `Development` | `Administrators` | Administrator, ReadOnly |
 | | `ReadOnly` | ReadOnly |
-| `Sandbox` | `Administrators` | Administrator, PowerUser, ReadOnly, AWSTransform |
-| | `Workshops` | PowerUser |
+| `Production` | `Administrators` | Administrator, ReadOnly |
+| `Sandbox` | `Administrators` | Administrator, ReadOnly |
+| | `ReadOnly` | ReadOnly |
 | | `AWSTransform` | AWSTransform |
+| | `DevOpsAgent` | DevOpsAgent |
+| | `AIGovernance` | AIGovernanceAccess |
 
 Only groups are ever assigned. There are no user-level assignments, by design.
+
+`ReadOnly` is the **baseline group**: every user in the base repo belongs to it.
+It replaced the `Developers` and `Workshops` groups, which added nothing beyond
+read access that this one does not. So a `ReadOnly` grant on an account now
+means "everyone can look at this account".
+
+That is why `Production` grants it to nobody. Only `Administrators` can see
+production. If a wider production-read audience is needed again it wants its own
+group in the base repo, because `ReadOnly` can no longer act as a gate for
+anything.
+
+`Administrators` holds exactly `AdministratorAccess` and `ReadOnlyAccess`, the
+same pair on all four accounts. No specialised set is bundled into it: a cohort
+set only ever reaches its own cohort, so exercising one means joining that group
+in the base repo like anybody else. That keeps every row of the table above
+answerable from the group name alone.
+
+The one near-admin exception is on `management`, where the `AIGovernance`
+**group** holds `AIGovernanceAdminAccess`. That is where Organizations write,
+delegated administrator registration and SCP management actually work, none of
+which is reachable from a member account. It is also the account SCPs do not apply
+to, which is why that document denies its own escape hatches rather than relying
+on a guardrail above it. See the `Deny` list on `ai_governance_admin_access` in
+`ai_governance.tf`.
 
 ## Operations
 
@@ -175,8 +207,8 @@ The most common change. Edit `grants` in `variables.tf`:
 
 ```hcl
 grants = {
-  Development = {
-    Developers = ["PowerUserAccess"]        # add or extend a line
+  Sandbox = {
+    DevOpsAgent = ["DevOpsAgentAccess"]     # add or extend a line
   }
 }
 ```
@@ -195,16 +227,10 @@ token expires.
 The other common change: someone needs to use a service they cannot reach yet,
 with a level of access they already have.
 
-1. Find the document in `policies.tf` that backs the permission set. The mapping
-   is `inline_policy_key` on the set in `variables.tf`:
-
-   | Permission set | Document |
-   |---|---|
-   | `PowerUserAccess` | `power_user_access` |
-   | `WorkshopOnlyAccess` | `infra_modify_only` |
-   | `AWSTransformAccess` | `partner_demo_access` |
-   | `AIGovernance` | `ai_governance` |
-
+1. Open the `policy_<name>.tf` file for the document that backs the set. The
+   mapping is `local.inline_policies` in `locals.tf`, which is keyed by
+   permission set name — so `DevOpsAgentAccess` resolves to
+   `devops_agent_access`, in `devops_agent.tf`.
 2. Add a statement, or actions to an existing one. Keep the narrowest verbs that
    do the job — prefer `sqs:GetQueueAttributes` over `sqs:*`.
 3. Run the loop and open the pull request.
@@ -212,32 +238,131 @@ with a level of access they already have.
 `AdministratorAccess` and `ReadOnlyAccess` use AWS managed policies, so there is
 no document to edit for those.
 
-Two things to check before assuming a new action works. The region lockdown is
+Three things to check before assuming a new action works. The region lockdown is
 merged into every set, so the action still only works in that set's approved
-regions. And `WorkshopOnlyAccess` carries an explicit `Deny` on create and
-destroy verbs, which beats any `Allow` you add — widen that list deliberately or
-not at all.
+regions. And `role_creation_guardrail`, also merged into every set except
+`AdministratorAccess`, denies IAM user creation and permissions boundary removal
+outright.
+
+If the action you are adding is `iam:CreateRole`, read the next section first.
+
+### Grant a set the ability to create IAM roles
+
+`iam:CreateRole` needs a separate statement from the other role writes, because
+the `iam:PermissionsBoundary` condition key only exists on the `CreateRole` call
+itself. Putting the condition on a statement that also carries
+`iam:AttachRolePolicy` would deny that instead — the key is absent there, so the
+condition can never match.
+
+```hcl
+statement {
+  sid       = "MyStackCreateRoleWithBoundary"
+  effect    = "Allow"
+  actions   = ["iam:CreateRole"]
+  resources = ["arn:aws:iam::*:role/my-prefix-*"]
+
+  condition {
+    test     = "ArnLike"
+    variable = "iam:PermissionsBoundary"
+    values   = [local.role_boundary_arn_pattern]
+  }
+}
+```
+
+The boundary is why this matters. `iam:AttachRolePolicy`'s resource is the *role*,
+not the policy being attached, so a set that can create a role in its prefix and
+attach a policy to it can attach `AdministratorAccess` and assume it. `iam:*` and
+`sts:*` are exempt from the region lockdown and no SCP covers it. Requiring the
+boundary at creation caps whatever the new role can do, and the guardrail stops
+the boundary being stripped afterwards.
+
+The boundary policy itself is created by the **base repository**, in every
+account. See `role_boundary_policy_name` in `variables.tf`.
+
+### The 10,240-byte cap
+
+Identity Center caps a permission set's inline policy at 10,240 bytes, counting
+non-whitespace only. Every set carries the region lockdown and the role-creation
+guardrail on top of its own document, so the budget is tighter than it looks.
+
+`AWSTransformAccess` is the set that runs into it. It carries four stacks - the
+AWS Transform service, the fbctf app being modernised, transform-agents and
+transform-containers - and without the collapses below it does not fit.
+
+It stays one set deliberately: a second set would put two roles in the SSO portal
+and the cohort would have to pick the right one mid-demo. Fitting under the cap
+instead means collapsing enumerated action lists to `service:*`, which is a real
+widening. The collapses, and why each is contained:
+
+| Statement | Granted as | Contained by |
+|---|---|---|
+| `AWSTransformService` | `transform:*` | the service this set exists to operate, granted on Sandbox only |
+| `AWSTransformSourceConnections` | `codeconnections:*` | one service, and the handshake half is unscoped anyway |
+| `AWSTransformStacks` | `cloudformation:*` | the `stack/AWSTransform*/*` name prefix |
+| `TransformAgentsBedrock` | `bedrock:*` | the region lockdown; the widest of the five |
+| `ServiceLinkedRoles` | `iam:CreateServiceLinkedRole` on a path | IAM itself: a service-linked role's trust and policies are service-owned |
+
+No IAM write statement is collapsed. `iam:*` on a role name prefix would let a
+holder create a role there and attach anything to it, so those keep their
+enumerated verbs.
+
+A `lifecycle` precondition on `aws_ssoadmin_permission_set_inline_policy` fails the
+plan with the actual byte count when a set goes over. Trust it: without it the
+overflow arrives as an opaque `ValidationException` from AWS partway through an
+apply, after earlier sets have already been written.
+
+If you hit it again, weigh a second set against more collapsing. There is not much
+left here that can be collapsed without touching IAM.
+
+### Permissions boundaries are currently off
+
+`role_plumbing.tf` can require every role a permission set creates to carry the
+`DelegatedRoleBoundary` boundary, which is what stops a scope that can create a
+role in its prefix from attaching `AdministratorAccess` to it and assuming it.
+`require_boundary` is `false` on every scope today.
+
+It has to be, because requiring the boundary only works if whatever creates the
+role sets it. The AWS Transform CodeBuild execution role comes from a
+CloudFormation template the service generates, with no `PermissionsBoundary`
+property and no way for us to add one, so requiring it denies `iam:CreateRole` and
+the demo cannot run. The cohort's own stacks (fbctf, transform-agents,
+transform-containers, the DevOps Agent demos) could set it but do not.
+
+What contains those scopes meanwhile: the region lockdown,
+`DenyAdminPolicyAttachment` in `shared.tf`, and the guardrail's denial of boundary
+stripping and IAM user creation. That is genuinely weaker - `iam:PutRolePolicy` on
+the prefix still allows an inline policy wider than the creator holds - and it is a
+deliberate trade.
+
+To close it for a scope: set `permissions_boundary` on every `aws_iam_role` in that
+stack, then flip `require_boundary` to `true`.
 
 ### Create a new permission set
 
-Four steps, all in this repository:
+Two steps, both in this repository:
 
-1. Write the policy document in `policies.tf`.
-2. Register its key in `local.inline_policies` at the top of that file.
-3. Add the key to the `inline_policy_key` validation in `variables.tf`, so a typo
-   fails CI instead of reaching AWS.
-4. Add the entry to `permission_sets`:
+1. Write the policy document in a new `policy_<name>.tf`.
+2. Register it in `local.inline_policies` in `locals.tf`, keyed by the permission
+   set's name, and add the entry to `permission_sets` in `variables.tf`:
 
    ```hcl
+   # locals.tf
+   DataAnalystAccess = data.aws_iam_policy_document.data_analyst_access.json
+
+   # variables.tf
    DataAnalystAccess = {
-     description       = "Query Athena and read the data lake"
-     inline_policy_key = "data_analyst_access"
-     session_duration  = "PT8H"
+     description      = "Query Athena and read the data lake"
+     session_duration = "PT8H"
    }
    ```
 
-Skip steps 1–3 if an AWS managed policy is enough — just set
-`managed_policy_arn` instead.
+Nothing points at the document by key: the set's own name is the link. A set that
+ends up in neither `local.inline_policies` nor with a `managed_policy_arn` fails a
+precondition in `permission_sets.tf` rather than silently provisioning with no
+permissions.
+
+Skip step 1 if an AWS managed policy is enough — just set `managed_policy_arn`
+instead.
 
 A permission set with no grant does nothing, so this is safe to merge on its own
 and grant later.
@@ -248,9 +373,8 @@ Set `allowed_regions` on it in `permission_sets`:
 
 ```hcl
 AWSTransformAccess = {
-  description       = "..."
-  inline_policy_key = "partner_demo_access"
-  allowed_regions   = ["us-west-2", "us-east-1"]
+  description     = "..."
+  allowed_regions = ["us-west-2", "us-east-1"]
 }
 ```
 
@@ -279,7 +403,7 @@ like `PT` passes CI and is rejected by AWS at apply. Give it a real duration.
 |---|---|
 | Renaming a key in `permission_sets` | `name` is immutable in AWS, so the set is destroyed and recreated. Every assignment pointing at it is dropped and everyone holding it loses access until it is reprovisioned |
 | Renaming an account or group in the base repository | Lookups here match on those names, so every grant referencing the old name breaks |
-| Adding an action already covered by a `Deny` | The `Deny` wins. `WorkshopOnlyAccess` denies create and destroy verbs outright |
+| Adding an action already covered by a `Deny` | The `Deny` wins. `role_creation_guardrail` denies IAM user creation and boundary removal in every set |
 | Merging a plan with unexplained destroys | Each destroyed assignment is somebody's access |
 
 The plan summary flags a non-zero destroy count for exactly this reason. Read the
@@ -344,7 +468,7 @@ assume it, and IAM enforces that. The bucket and key are Secrets to keep the
 bucket name out of a public repository.
 
 `region`, `encrypt` and `use_lockfile` are not configurable — they are in
-`config.tf`, since none is environment-specific. Only the bucket and key are
+`backend.tf`, since none is environment-specific. Only the bucket and key are
 passed to `terraform init`.
 
 The key must stay under the `aws-access/` prefix. The IAM role's S3 policy is
@@ -377,7 +501,7 @@ tflint
 and no `tflint --init`.
 
 To run against real state, pass the bucket and key. Region and encryption come
-from `config.tf`:
+from `backend.tf`:
 
 ```sh
 terraform init \
@@ -401,7 +525,7 @@ negation patterns.
 
 Names of resources the policies *grant on* are fine to commit — they are targets,
 not credentials. Three are committed as variable defaults today:
-`state_bucket_names`, `demo_app_prefix` and `demo_app_region`. If a new policy
+`demo_app_prefix` and `demo_app_region`. If a new policy
 needs a resource name to scope to, add a variable for it rather than inlining the
 string, so every such name stays visible in one place.
 
@@ -421,35 +545,73 @@ passes no `-var-file`, so `variables.tf` is the whole desired state.
 | `init` fails with 403 on `HeadObject` | `TF_STATE_KEY` points outside the `aws-access/` prefix | Put the key back under `aws-access/` |
 | Plan wants to replace a permission set | A key in `permission_sets` was renamed | Revert the rename, or accept the access interruption deliberately |
 | A user has no access despite the grant | They are not in the group | Membership lives in the base repository |
-| An allowed action is still refused | Wrong region for that set, or an explicit `Deny` covers it | Check `allowed_regions`, then the `Deny` statements in `policies.tf` |
+| An allowed action is still refused | Wrong region for that set, or an explicit `Deny` covers it | Check `allowed_regions`, then the `Deny` statements in the `policies_*.tf` files |
 
 ## Reference
 
 ### Layout
 
+File names follow the Terraform style guide: `terraform.tf` for version
+constraints, `backend.tf` for the backend, `providers.tf` for the provider,
+`locals.tf` for values shared across files, and the rest split by concern.
+
+The root is resource wiring. Every IAM policy is authored in
+`modules/policies`, and each policy file is named after the permission set it
+backs.
+
 ```
-config.tf            versions, provider, S3 backend (bucket and key passed at init)
+terraform.tf         required_version and required_providers
+backend.tf           S3 backend (bucket and key passed at init)
+providers.tf         the aws provider and its default_tags
 lookups.tf           discovers accounts, groups and the SSO instance from AWS
 variables.tf         permission_sets and grants — the reviewed desired state
-policies.tf          inline IAM policies + the per-set region lockdown
-permission_sets.tf   permission sets and their policy attachments
+permission_sets.tf   the sets, their attachments, and the module call
 assignments.tf       group → account → permission set
 outputs.tf
+
+modules/policies/
+├── terraform.tf              provider requirements for the module
+├── variables.tf              the prefixes and names the policies scope to
+├── locals.tf                 permission set → document mapping, and the merge
+├── outputs.tf                one finished inline policy per set
+├── shared.tf                 merged into every set: region lockdown + guardrail
+├── role_plumbing.tf          CreateRole / PassRole / service-linked, per scope
+├── devops_agent.tf           DevOpsAgentAccess
+├── aws_transform.tf          AWSTransformAccess
+└── ai_governance.tf          AIGovernanceAccess, AIGovernanceAdminAccess
 ```
 
-Terraform `>= 1.10.0`, for `use_lockfile` in the backend. AWS provider `>= 5.0`.
-State locking is S3-native; there is no DynamoDB table.
+Each document is the snake_case of the set it backs, so
+`local.inline_policies` reads as an identity map and there is nothing to look up:
+`AIGovernanceAccess` is `ai_governance_access`, in `ai_governance.tf`.
+
+Two files are not named after a set because they do not belong to one.
+`shared.tf` holds the region lockdown and the role-creation guardrail, both merged
+into every set. `role_plumbing.tf` generates the `iam:CreateRole`, `iam:PassRole`
+and `iam:CreateServiceLinkedRole` statements from one table of scopes, so a stack
+that manages its own roles is an entry in that table rather than three statements
+copied into a policy file.
+
+The module creates **no resources** — every block in it is a data source the AWS
+provider renders locally. That is what makes it safe to reorganize: there is
+nothing in state to move, and the only thing that can change is the rendered JSON.
+
+Terraform `>= 1.10.0`, for `use_lockfile` in the backend. AWS provider `~> 6.0`,
+with the exact version pinned in `.terraform.lock.hcl`. State locking is
+S3-native; there is no DynamoDB table.
 
 ### Variables
 
 | Name | Purpose | Default |
 |---|---|---|
-| `permission_sets` | The available access levels | the five sets above |
+| `permission_sets` | The available access levels | the six sets above |
 | `grants` | Account name → group name → permission sets | the table above |
 | `region` | Identity Center region and the default region lockdown | `us-west-2` |
-| `state_bucket_names` | Buckets the modify-only set may read/write | `["cloudcrafters-workshop-2026-tfstate"]` |
 | `demo_app_prefix` | Resource prefix scoping the demo stack | `fbctf` |
 | `demo_app_region` | Region for the partner demo web app | `us-east-1` |
+| `role_boundary_policy_name` | Permissions boundary required at `iam:CreateRole`, created by the base repo | `DelegatedRoleBoundary` |
+| `transform_agents_prefix` | Resource prefix scoping the transform-agents PoC | `transform-agents` |
+| `transform_container_prefix` | Resource prefix scoping the transform-containers PoC | `transform-containers` |
 
 ### Outputs
 

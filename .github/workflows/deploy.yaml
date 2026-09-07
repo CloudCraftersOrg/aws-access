@@ -74,7 +74,7 @@ jobs:
           terraform_wrapper: false
 
       # Only bucket and key are passed here; region and encrypt live in
-      # config.tf. The key must stay under the aws-access/ prefix, because the
+      # backend.tf. The key must stay under the aws-access/ prefix, because the
       # IAM role's S3 policy is scoped to a prefix named after this repo.
       - name: Init
         run: |
