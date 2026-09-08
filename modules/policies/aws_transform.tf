@@ -219,12 +219,14 @@ data "aws_iam_policy_document" "aws_transform_access" {
       "autoscaling:*",
       "cloudwatch:*",
       "ec2:*",
+      "ecs:*",
       "elasticache:*",
       "elasticloadbalancing:*",
       "kms:DescribeKey",
       "kms:ListAliases",
       "logs:*",
       "rds:*",
+      "s3:ListAllMyBuckets",
       "ssm:*",
     ]
     resources = ["*"]

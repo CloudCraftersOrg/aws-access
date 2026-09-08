@@ -48,6 +48,7 @@ locals {
         "eks.amazonaws.com",
         "lambda.amazonaws.com",
         "monitoring.rds.amazonaws.com",
+        "vpc-flow-logs.amazonaws.com",
       ]
       service_linked_for = [
         "autoscaling.amazonaws.com",
