@@ -51,6 +51,7 @@ locals {
         "vpc-flow-logs.amazonaws.com",
       ]
       service_linked_for = [
+        "aidevops.amazonaws.com",
         "autoscaling.amazonaws.com",
         "ecs.amazonaws.com",
         "eks.amazonaws.com",
