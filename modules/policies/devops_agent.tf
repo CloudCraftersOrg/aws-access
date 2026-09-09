@@ -118,13 +118,7 @@ data "aws_iam_policy_document" "devops_agent_access" {
     sid    = "DevOpsAgentCloudFormationWrite"
     effect = "Allow"
     actions = [
-      "cloudformation:CreateChangeSet",
-      "cloudformation:CreateStack",
-      "cloudformation:DeleteChangeSet",
-      "cloudformation:DeleteStack",
-      "cloudformation:ExecuteChangeSet",
-      "cloudformation:UpdateStack",
-      "cloudformation:ValidateTemplate",
+      "cloudformation:*",
     ]
     resources = ["*"]
   }
