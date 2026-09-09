@@ -43,6 +43,7 @@ locals {
         "arn:aws:iam::*:role/devops-agent-*",
       ]
       passed_to_services = [
+        "aidevops.amazonaws.com",
         "ec2.amazonaws.com",
         "ecs-tasks.amazonaws.com",
         "eks.amazonaws.com",
