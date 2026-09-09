@@ -180,15 +180,7 @@ data "aws_iam_policy_document" "devops_agent_access" {
       "events:TagResource",
       "events:UntagResource",
 
-      "lambda:CreateFunction",
-      "lambda:AddPermission",
-      "lambda:DeleteFunction",
-      "lambda:InvokeFunction",
-      "lambda:RemovePermission",
-      "lambda:TagResource",
-      "lambda:UntagResource",
-      "lambda:UpdateFunctionCode",
-      "lambda:UpdateFunctionConfiguration",
+      "lambda:*",
 
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
