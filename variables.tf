@@ -176,7 +176,8 @@ variable "grants" {
       ReadOnly       = ["ReadOnlyAccess"]
       DevOpsAgent    = ["DevOpsAgentAccess"]
       AWSTransform   = ["AWSTransformAccess"]
-      AIGovernance   = ["AIGovernance"]
+      AIGovernance   = ["AIGovernanceAccess"]
+      EdgeAI         = ["EdgeAIAccess"] # must exist as a group in the base repo first
     }
   }
 
