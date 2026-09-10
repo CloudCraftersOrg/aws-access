@@ -43,13 +43,16 @@ locals {
         "arn:aws:iam::*:role/devops-agent-*",
       ]
       passed_to_services = [
+        "aidevops.amazonaws.com",
         "ec2.amazonaws.com",
         "ecs-tasks.amazonaws.com",
         "eks.amazonaws.com",
         "lambda.amazonaws.com",
         "monitoring.rds.amazonaws.com",
+        "vpc-flow-logs.amazonaws.com",
       ]
       service_linked_for = [
+        "aidevops.amazonaws.com",
         "autoscaling.amazonaws.com",
         "ecs.amazonaws.com",
         "eks.amazonaws.com",
@@ -121,6 +124,32 @@ locals {
         "scheduler.amazonaws.com",
       ]
       service_linked_for = []
+    }
+
+    EdgeAI = {
+      require_boundary = false
+      role_arns        = ["arn:aws:iam::*:role/${var.edge_ai_prefix}-*"]
+      passed_to_services = [
+        "batch.amazonaws.com",
+        "ec2.amazonaws.com",
+        "eks.amazonaws.com",
+        "firehose.amazonaws.com",
+        "glue.amazonaws.com",
+        "grafana.amazonaws.com",
+        "greengrass.amazonaws.com",
+        "iot.amazonaws.com",
+        "lambda.amazonaws.com",
+        "rds.amazonaws.com",
+        "sagemaker.amazonaws.com",
+      ]
+      service_linked_for = [
+        "batch.amazonaws.com",
+        "eks-nodegroup.amazonaws.com",
+        "eks.amazonaws.com",
+        "elasticloadbalancing.amazonaws.com",
+        "grafana.amazonaws.com",
+        "rds.amazonaws.com",
+      ]
     }
   }
 }

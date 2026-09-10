@@ -12,6 +12,11 @@ variable "demo_app_region" {
   description = "Region hosting the partner demo web application."
 }
 
+variable "edge_ai_prefix" {
+  type        = string
+  description = "Resource name prefix for the Edge AI Landing Zone pilot."
+}
+
 variable "permission_sets" {
   type = map(object({
     description        = string

@@ -14,6 +14,7 @@ module "policies" {
   demo_app_region            = var.demo_app_region
   transform_agents_prefix    = var.transform_agents_prefix
   transform_container_prefix = var.transform_container_prefix
+  edge_ai_prefix             = var.edge_ai_prefix
 }
 
 resource "aws_ssoadmin_permission_set" "this" {

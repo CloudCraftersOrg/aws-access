@@ -104,6 +104,7 @@ data "aws_iam_policy_document" "devops_agent_access" {
       "sns:List*",
       "sqs:GetQueue*",
       "sqs:ListQueues",
+      "sqs:ListQueueTags",
       "ssm:Describe*",
       "ssm:List*",
       "xray:BatchGet*",
@@ -117,13 +118,7 @@ data "aws_iam_policy_document" "devops_agent_access" {
     sid    = "DevOpsAgentCloudFormationWrite"
     effect = "Allow"
     actions = [
-      "cloudformation:CreateChangeSet",
-      "cloudformation:CreateStack",
-      "cloudformation:DeleteChangeSet",
-      "cloudformation:DeleteStack",
-      "cloudformation:ExecuteChangeSet",
-      "cloudformation:UpdateStack",
-      "cloudformation:ValidateTemplate",
+      "cloudformation:*",
     ]
     resources = ["*"]
   }
@@ -179,15 +174,7 @@ data "aws_iam_policy_document" "devops_agent_access" {
       "events:TagResource",
       "events:UntagResource",
 
-      "lambda:CreateFunction",
-      "lambda:AddPermission",
-      "lambda:DeleteFunction",
-      "lambda:InvokeFunction",
-      "lambda:RemovePermission",
-      "lambda:TagResource",
-      "lambda:UntagResource",
-      "lambda:UpdateFunctionCode",
-      "lambda:UpdateFunctionConfiguration",
+      "lambda:*",
 
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
@@ -214,13 +201,7 @@ data "aws_iam_policy_document" "devops_agent_access" {
       "sns:Unsubscribe",
       "sns:UntagResource",
 
-      "sqs:CreateQueue",
-      "sqs:DeleteQueue",
-      "sqs:PurgeQueue",
-      "sqs:SendMessage",
-      "sqs:SetQueueAttributes",
-      "sqs:TagQueue",
-      "sqs:UntagQueue",
+      "sqs:*",
 
       "ssm:*",
     ]
@@ -228,25 +209,9 @@ data "aws_iam_policy_document" "devops_agent_access" {
   }
 
   statement {
-    sid    = "DevOpsAgentS3Scoped"
-    effect = "Allow"
-    actions = [
-      "s3:CreateBucket",
-      "s3:DeleteBucket",
-      "s3:DeleteBucketPolicy",
-      "s3:DeleteObject",
-      "s3:DeleteObjectVersion",
-      "s3:GetBucketLocation",
-      "s3:GetBucketVersioning",
-      "s3:GetObject",
-      "s3:ListBucket",
-      "s3:ListBucketVersions",
-      "s3:PutBucketEncryption",
-      "s3:PutBucketPolicy",
-      "s3:PutBucketPublicAccessBlock",
-      "s3:PutBucketVersioning",
-      "s3:PutObject",
-    ]
+    sid     = "DevOpsAgentS3Scoped"
+    effect  = "Allow"
+    actions = ["s3:*"]
     resources = [
       "arn:aws:s3:::demo-*",
       "arn:aws:s3:::demo-*/*",

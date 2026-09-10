@@ -219,12 +219,14 @@ data "aws_iam_policy_document" "aws_transform_access" {
       "autoscaling:*",
       "cloudwatch:*",
       "ec2:*",
+      "ecs:*",
       "elasticache:*",
       "elasticloadbalancing:*",
       "kms:DescribeKey",
       "kms:ListAliases",
       "logs:*",
       "rds:*",
+      "s3:ListAllMyBuckets",
       "ssm:*",
     ]
     resources = ["*"]
@@ -239,8 +241,6 @@ data "aws_iam_policy_document" "aws_transform_access" {
       "arn:aws:s3:::${var.demo_app_prefix}-*/*",
     ]
   }
-
-
 
   statement {
     sid    = "FbctfIamWriteScoped"
@@ -310,6 +310,17 @@ data "aws_iam_policy_document" "aws_transform_access" {
       "iam:UpdateRoleDescription",
     ]
     resources = ["arn:aws:iam::*:role/${var.transform_container_prefix}-*"]
+  }
+
+  # S3 for the containers PoC ALB logs bucket (tcpoc-* prefix).
+  statement {
+    sid     = "TransformContainerS3"
+    effect  = "Allow"
+    actions = ["s3:*"]
+    resources = [
+      "arn:aws:s3:::*poc-*",
+      "arn:aws:s3:::*poc-*/*",
+    ]
   }
 
   # Bedrock for the transform-agents PoC. bedrock:* under the byte cap, and the

@@ -89,6 +89,10 @@ variable "permission_sets" {
         "us-east-1", "us-east-2", "us-west-1", "us-west-2",
       ]
     }
+    # Edge AI Landing Zone pilot. No allowed_regions override, so it's capped to var.region.
+    EdgeAIAccess = {
+      description = "Edge AI Landing Zone pilot: govern model delivery, fleet control and inference observability for edge/IoT devices"
+    }
   }
 
   # Requires at least one component, so the degenerate "PT" fails here rather than
@@ -162,6 +166,7 @@ variable "grants" {
       DevOpsAgent    = ["DevOpsAgentAccess"]
       AWSTransform   = ["AWSTransformAccess"]
       AIGovernance   = ["AIGovernanceAccess"]
+      EdgeAI         = ["EdgeAIAccess"] # must exist as a group in the base repo first
     }
   }
 
@@ -267,4 +272,12 @@ variable "transform_container_prefix" {
   type        = string
   description = "Resource name prefix for the ECS containers PoC stack."
   default     = "transform-containers"
+}
+
+
+# Resource name prefix for the Edge AI Landing Zone pilot's resources.
+variable "edge_ai_prefix" {
+  type        = string
+  description = "Resource name prefix for the Edge AI Landing Zone pilot."
+  default     = "edge-ai"
 }
