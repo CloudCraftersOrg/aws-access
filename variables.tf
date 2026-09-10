@@ -39,10 +39,21 @@ variable "permission_sets" {
     # explicit deny. us-east-1 is where the partner services (AWS Transform,
     # MGN) live, and admins have to be able to reach them to validate the
     # cohort's access.
+    #
+    # us-east-2 carries no workload and is here only for Bedrock cross-region
+    # inference profiles. A `us.*` model ID fans a single request out across
+    # us-east-1, us-east-2 and us-west-2, and each leg authorizes against the
+    # region it lands in, not the region the call was made from. With us-east-2
+    # missing, invoking `us.amazon.nova-2-lite-v1:0` from us-east-1 failed with
+    # an explicit deny naming an us-east-2 ARN, which reads like a us-east-1
+    # problem and is not one. Admins have to be able to reach the profile IDs to
+    # reproduce what the cohort's Lambda roles do at runtime — those roles carry
+    # no region cap, since require_boundary is false everywhere and no SCP
+    # restricts regions.
     AdministratorAccess = {
       description        = "Full administrative access to all AWS services"
       managed_policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
-      allowed_regions    = ["us-east-1", "us-west-2"]
+      allowed_regions    = ["us-east-1", "us-east-2", "us-west-2"]
     }
     # The general-purpose read set, and the baseline every other set builds on.
     ReadOnlyAccess = {
