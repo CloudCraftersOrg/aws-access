@@ -423,12 +423,41 @@ data "aws_iam_policy_document" "aws_transform_access" {
       "scheduler:CreateSchedule",
       "scheduler:DeleteSchedule",
       "scheduler:GetSchedule",
-      "scheduler:ListSchedules",
       "scheduler:TagResource",
       "scheduler:UntagResource",
       "scheduler:UpdateSchedule",
     ]
     resources = ["arn:aws:scheduler:*:*:schedule/*/${var.transform_agents_prefix}-*"]
+  }
+
+  # ListSchedules publishes no resource type, so it never matched the prefix above
+  # and came back as an explicit deny while every other verb worked. Split out onto
+  # "*" for the same reason as TransformAgentsListTables. Terraform itself reads
+  # through GetSchedule and so never hit this; it is the operator listing what the
+  # stack deployed who does.
+  statement {
+    sid       = "TransformAgentsListSchedules"
+    effect    = "Allow"
+    actions   = ["scheduler:ListSchedules"]
+    resources = ["*"]
+  }
+
+  # The agent's other waker. The schedule above fires on a fixed interval whether
+  # or not the estate moved; this rule carries MGN's own state changes to the same
+  # Lambda, so a launch that finishes is acted on when it finishes instead of at
+  # the next tick.
+  #
+  # events:* on a prefix-scoped rule, the same collapse as TransformAgentsTables
+  # and TransformAgentsEcr. The rule lives on the default event bus, so its ARN is
+  # rule/<name> with no bus segment, and the prefix is what contains this. Every
+  # verb Terraform uses here - PutRule, DescribeRule, DeleteRule, PutTargets,
+  # RemoveTargets, ListTargetsByRule and the tagging pair - is rule-scoped, so
+  # nothing account-wide is needed alongside it.
+  statement {
+    sid       = "TransformAgentsEvents"
+    effect    = "Allow"
+    actions   = ["events:*"]
+    resources = ["arn:aws:events:*:*:rule/${var.transform_agents_prefix}-*"]
   }
 
   statement {
