@@ -54,7 +54,7 @@ variable "permission_sets" {
       allowed_regions   = ["us-east-1", "us-west-2"]
     }
     AWSTransformAccess = {
-      description       = "AWS Transform demo cohort: web app sign-in plus deploying the fbctf demo app"
+      description       = "AWS Transform demo cohort: web app sign-in plus deploying the transform-demo estates"
       inline_policy_key = "partner_demo_access"
       allowed_regions   = ["us-west-2", "us-east-1"]
     }
@@ -173,7 +173,7 @@ variable "state_bucket_names" {
 variable "demo_app_prefix" {
   type        = string
   description = "Resource name prefix for the demo application stack."
-  default     = "fbctf"
+  default     = "transform-demo"
 }
 
 # The partner service is not available in var.region.

@@ -775,14 +775,14 @@ data "aws_iam_policy_document" "devops_agent_access" {
 # (us-west-2 plus us-east-1, because the partner service is us-east-1 only).
 #
 # AWS Transform demo cohort: sign in to the web app, plus deploy the legacy
-# fbctf stack the demo modernizes.
+# transform-demo estates the demo modernizes (var.demo_app_prefix).
 #
 # The AWSTransform* half is small because the service only authorizes entry to
 # its web app with IAM, then hands off to its own workspace roles for everything
 # done inside. Work a job performs in the account runs under a service-linked
 # role, not the user's session.
 #
-# The Fbctf* statements exist for the cohort's own `terraform apply`, not for
+# The DemoStack* statements exist for the cohort's own `terraform apply`, not for
 # anything AWS Transform does.
 data "aws_iam_policy_document" "partner_demo_access" {
   # Without this the console header cannot render the signed-in account.
@@ -857,7 +857,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
   }
 
   # Accepting a connector request creates a service role for it. Path-scoped to
-  # AWSTransform-*, so this does not widen the fbctf-* IAM scope below.
+  # AWSTransform-*, so this does not widen the demo-prefix IAM scope below.
   statement {
     sid    = "AWSTransformConnectorServiceRole"
     effect = "Allow"
@@ -933,7 +933,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
   # Service-wide allows are acceptable here: the set is region-locked, granted
   # only to the cohort, and the sensitive edges are prefix-scoped below.
   statement {
-    sid    = "FbctfInfraDeploy"
+    sid    = "DemoStackInfraDeploy"
     effect = "Allow"
     actions = [
       "autoscaling:*",
@@ -951,7 +951,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
   }
 
   statement {
-    sid     = "FbctfS3"
+    sid     = "DemoStackS3"
     effect  = "Allow"
     actions = ["s3:*"]
     resources = [
@@ -963,14 +963,14 @@ data "aws_iam_policy_document" "partner_demo_access" {
   # Reads are account-wide because terraform refresh resolves AWS managed
   # policies and service roles outside the prefix.
   statement {
-    sid       = "FbctfIamRead"
+    sid       = "DemoStackIamRead"
     effect    = "Allow"
     actions   = ["iam:Get*", "iam:List*"]
     resources = ["*"]
   }
 
   statement {
-    sid    = "FbctfIamWriteScoped"
+    sid    = "DemoStackIamWriteScoped"
     effect = "Allow"
     actions = [
       "iam:AddRoleToInstanceProfile",
@@ -995,7 +995,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
   }
 
   statement {
-    sid       = "FbctfIamPassRole"
+    sid       = "DemoStackIamPassRole"
     effect    = "Allow"
     actions   = ["iam:PassRole"]
     resources = ["arn:aws:iam::*:role/${var.demo_app_prefix}-*"]
@@ -1009,7 +1009,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
 
   # The first apply in a fresh account creates these.
   statement {
-    sid       = "FbctfServiceLinkedRoles"
+    sid       = "DemoStackServiceLinkedRoles"
     effect    = "Allow"
     actions   = ["iam:CreateServiceLinkedRole"]
     resources = ["*"]
@@ -1028,7 +1028,7 @@ data "aws_iam_policy_document" "partner_demo_access" {
 
   # rds!* covers the master secret RDS creates when it manages the password.
   statement {
-    sid     = "FbctfSecrets"
+    sid     = "DemoStackSecrets"
     effect  = "Allow"
     actions = ["secretsmanager:*"]
     resources = [

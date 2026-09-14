@@ -448,7 +448,7 @@ State locking is S3-native; there is no DynamoDB table.
 | `grants` | Account name → group name → permission sets | the table above |
 | `region` | Identity Center region and the default region lockdown | `us-west-2` |
 | `state_bucket_names` | Buckets the modify-only set may read/write | `["cloudcrafters-workshop-2026-tfstate"]` |
-| `demo_app_prefix` | Resource prefix scoping the demo stack | `fbctf` |
+| `demo_app_prefix` | Resource prefix scoping the demo stack | `transform-demo` |
 | `demo_app_region` | Region for the partner demo web app | `us-east-1` |
 
 ### Outputs
