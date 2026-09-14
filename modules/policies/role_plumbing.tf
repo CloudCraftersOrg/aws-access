@@ -15,7 +15,7 @@
 # What is deliberately NOT collapsed here:
 #
 #   The scoped IAM *write* statements (DevOpsAgentIamWriteScoped,
-#   FbctfIamWriteScoped, TransformAgentsRoles, GovernanceServiceRoles,
+#   DemoStackIamWriteScoped, TransformAgentsRoles, GovernanceServiceRoles,
 #   TransformContainerRoles, AWSTransformCodeBuildExecutionRole). They look alike
 #   but their action lists genuinely differ - some carry instance profile verbs,
 #   some carry policy verbs, some neither. Folding them into one shape would mean
@@ -95,7 +95,7 @@ locals {
       service_linked_for = []
     }
 
-    Fbctf = {
+    DemoStack = {
       require_boundary   = false
       role_arns          = ["arn:aws:iam::*:role/${var.demo_app_prefix}-*"]
       passed_to_services = ["ec2.amazonaws.com"]
@@ -176,7 +176,7 @@ data "aws_iam_policy_document" "role_plumbing" {
   #                            edit, so requiring one denies CreateRole outright
   #                            and the demo cannot run.
   #
-  #   Fbctf, TransformAgents,  The cohort's own Terraform. It could set a
+  #   DemoStack, TransformAgents,  The cohort's own Terraform. It could set a
   #   TransformContainer,      boundary, but does not today, so turning this on
   #   DevOpsAgent, Governance  breaks their applies until it does.
   #
