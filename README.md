@@ -288,7 +288,7 @@ non-whitespace only. Every set carries the region lockdown and the role-creation
 guardrail on top of its own document, so the budget is tighter than it looks.
 
 `AWSTransformAccess` is the set that runs into it. It carries four stacks - the
-AWS Transform service, the fbctf app being modernised, transform-agents and
+AWS Transform service, the transform-demo estates being modernised, transform-agents and
 transform-containers - and without the collapses below it does not fit.
 
 It stays one set deliberately: a second set would put two roles in the SSO portal
@@ -327,7 +327,7 @@ It has to be, because requiring the boundary only works if whatever creates the
 role sets it. The AWS Transform CodeBuild execution role comes from a
 CloudFormation template the service generates, with no `PermissionsBoundary`
 property and no way for us to add one, so requiring it denies `iam:CreateRole` and
-the demo cannot run. The cohort's own stacks (fbctf, transform-agents,
+the demo cannot run. The cohort's own stacks (transform-demo, transform-agents,
 transform-containers, the DevOps Agent demos) could set it but do not.
 
 What contains those scopes meanwhile: the region lockdown,
@@ -609,7 +609,7 @@ S3-native; there is no DynamoDB table.
 | `permission_sets` | The available access levels | the seven sets above |
 | `grants` | Account name → group name → permission sets | the table above |
 | `region` | Identity Center region and the default region lockdown | `us-west-2` |
-| `demo_app_prefix` | Resource prefix scoping the demo stack | `fbctf` |
+| `demo_app_prefix` | Resource prefix scoping the demo stack | `transform-demo` |
 | `demo_app_region` | Region for the partner demo web app | `us-east-1` |
 | `role_boundary_policy_name` | Permissions boundary required at `iam:CreateRole`, created by the base repo | `DelegatedRoleBoundary` |
 | `transform_agents_prefix` | Resource prefix scoping the transform-agents PoC | `transform-agents` |

@@ -1,7 +1,7 @@
 # Policy document for AWSTransformAccess, the partner demo cohort's set.
 #
 # Alone in its own file because it is by far the largest document here: it covers
-# sign-in to the AWS Transform web app, the legacy fbctf stack the demo
+# sign-in to the AWS Transform web app, the transform-demo estates the demo
 # modernizes, and the two PoC stacks the cohort deploys themselves
 # (transform-agents and transform-containers).
 #
@@ -11,8 +11,8 @@
 # Used by: AWSTransformAccess, the only set allowed outside var.region
 # (us-west-2 plus us-east-1, because the partner service is us-east-1 only).
 #
-# AWS Transform demo cohort: sign in to the web app, deploy the legacy fbctf
-# stack the demo modernizes, and run the transform-agents PoC (Bedrock plus
+# AWS Transform demo cohort: sign in to the web app, deploy the transform-demo
+# estates the demo modernizes, and run the transform-agents PoC (Bedrock plus
 # its own transform-agents-* stack).
 #
 # The AWSTransform* half is small because the service only authorizes entry to
@@ -20,16 +20,16 @@
 # done inside. Work a job performs in the account runs under a service-linked
 # role, not the user's session.
 #
-# The Fbctf* statements exist for the cohort's own `terraform apply`, not for
+# The DemoStack* statements exist for the cohort's own `terraform apply`, not for
 # anything AWS Transform does.
 data "aws_iam_policy_document" "aws_transform_access" {
   # All five role scopes feed this one set: the two AWSTransform service roles, the
-  # fbctf demo stack, and the two PoC stacks. All from role_plumbing.tf.
+  # transform-demo estates, and the two PoC stacks. All from role_plumbing.tf.
   source_policy_documents = [
     data.aws_iam_policy_document.console_and_iam_read.json,
     data.aws_iam_policy_document.role_plumbing["AWSTransformConnector"].json,
     data.aws_iam_policy_document.role_plumbing["AWSTransformCodeBuild"].json,
-    data.aws_iam_policy_document.role_plumbing["Fbctf"].json,
+    data.aws_iam_policy_document.role_plumbing["DemoStack"].json,
     data.aws_iam_policy_document.role_plumbing["TransformContainer"].json,
     data.aws_iam_policy_document.role_plumbing["TransformAgents"].json,
   ]
@@ -194,7 +194,7 @@ data "aws_iam_policy_document" "aws_transform_access" {
   #
   # CreatePolicyVersion and SetDefaultPolicyVersion are the redeploy path: a
   # changed policy body becomes a new default version rather than a new policy.
-  # Get*/List* are already granted account-wide by FbctfIamRead.
+  # Get*/List* are already granted account-wide by DemoStackIamRead.
   statement {
     sid    = "AWSTransformCodeBuildPolicies"
     effect = "Allow"
@@ -213,7 +213,7 @@ data "aws_iam_policy_document" "aws_transform_access" {
   # Service-wide allows are acceptable here: the set is region-locked, granted
   # only to the cohort, and the sensitive edges are prefix-scoped below.
   statement {
-    sid    = "FbctfInfraDeploy"
+    sid    = "DemoStackInfraDeploy"
     effect = "Allow"
     actions = [
       "autoscaling:*",
@@ -233,7 +233,7 @@ data "aws_iam_policy_document" "aws_transform_access" {
   }
 
   statement {
-    sid     = "FbctfS3"
+    sid     = "DemoStackS3"
     effect  = "Allow"
     actions = ["s3:*"]
     resources = [
@@ -243,7 +243,7 @@ data "aws_iam_policy_document" "aws_transform_access" {
   }
 
   statement {
-    sid    = "FbctfIamWriteScoped"
+    sid    = "DemoStackIamWriteScoped"
     effect = "Allow"
     actions = [
       "iam:AddRoleToInstanceProfile",
@@ -271,7 +271,7 @@ data "aws_iam_policy_document" "aws_transform_access" {
 
   # rds!* covers the master secret RDS creates when it manages the password.
   statement {
-    sid     = "FbctfSecrets"
+    sid     = "DemoStackSecrets"
     effect  = "Allow"
     actions = ["secretsmanager:*"]
     resources = [
@@ -392,7 +392,7 @@ data "aws_iam_policy_document" "aws_transform_access" {
 
   # Collapsed from an enumeration to service:* on the same prefix-scoped
   # resource, to stay under the 10,240 non-whitespace byte cap on a permission
-  # set inline policy. Same trade already made by FbctfS3, FbctfSecrets and
+  # set inline policy. Same trade already made by DemoStackS3, DemoStackSecrets and
   # TransformAgentsVectorStore: the prefix, not the verb list, is what contains
   # these. Re-enumerating any of them costs roughly 400-550 bytes of budget.
   statement {
@@ -493,7 +493,7 @@ data "aws_iam_policy_document" "aws_transform_access" {
     resources = ["arn:aws:budgets::*:budget/${var.transform_agents_prefix}-*"]
   }
 
-  # The runtime and step-dispatcher roles, path-scoped like FbctfIamWriteScoped.
+  # The runtime and step-dispatcher roles, path-scoped like DemoStackIamWriteScoped.
   statement {
     sid    = "TransformAgentsRoles"
     effect = "Allow"

@@ -65,7 +65,7 @@ variable "permission_sets" {
       allowed_regions = ["us-east-1", "us-west-2"]
     }
     AWSTransformAccess = {
-      description     = "AWS Transform demo cohort: web app sign-in plus deploying the fbctf demo app"
+      description     = "AWS Transform demo cohort: web app sign-in plus deploying the transform-demo estates"
       allowed_regions = ["us-west-2", "us-east-1"]
     }
 
@@ -233,7 +233,7 @@ variable "grants" {
 variable "demo_app_prefix" {
   type        = string
   description = "Resource name prefix for the demo application stack."
-  default     = "fbctf"
+  default     = "transform-demo"
 }
 
 # The partner service is not available in var.region.
@@ -278,7 +278,7 @@ variable "transform_agents_prefix" {
 # Prefix the transform-containers PoC stack's Secrets Manager and IAM role access
 # is scoped to, in the aws_transform_access document. Security groups are not
 # scoped by this prefix despite an earlier comment here saying so: EC2 networking
-# comes from the account-wide ec2:* in FbctfInfraDeploy.
+# comes from the account-wide ec2:* in DemoStackInfraDeploy.
 variable "transform_container_prefix" {
   type        = string
   description = "Resource name prefix for the ECS containers PoC stack."
