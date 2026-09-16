@@ -11,11 +11,9 @@
 # (data lake, orchestration, analytics) outside any VPC.
 #
 # First pass over a large proposal - expect follow-up PRs, like EdgeAIAccess.
-# Deferred to a follow-up once real resource names exist: QuickSight author
-# grants for the 7 dashboards, the CID CloudFormation stack, Well-Architected
-# workload writes. Not modeled here at all: the GitHub App `dp-discovery-reader`
-# (task P2-04) is not an AWS resource - it is created by hand by a GitHub org
-# owner, outside this repo.
+# Not modeled here at all: the GitHub App `dp-discovery-reader` (task P2-04)
+# is not an AWS resource - it is created by hand by a GitHub org owner,
+# outside this repo.
 data "aws_iam_policy_document" "ai_discovery_access" {
   # The console/IAM read pair and the AIDiscovery role plumbing, both from
   # role_plumbing.tf.
@@ -32,6 +30,9 @@ data "aws_iam_policy_document" "ai_discovery_access" {
     actions = [
       "athena:Get*",
       "athena:List*",
+      "cloudformation:Describe*",
+      "cloudformation:Get*",
+      "cloudformation:List*",
       "cloudtrail:Describe*",
       "cloudtrail:Get*",
       "cloudtrail:List*",
@@ -68,8 +69,6 @@ data "aws_iam_policy_document" "ai_discovery_access" {
       "logs:Get*",
       "network-firewall:Describe*",
       "network-firewall:List*",
-      "quicksight:Describe*",
-      "quicksight:List*",
       "ram:Get*",
       "ram:List*",
       "rds:Describe*",
@@ -82,8 +81,6 @@ data "aws_iam_policy_document" "ai_discovery_access" {
       "sns:List*",
       "states:Describe*",
       "states:List*",
-      "wellarchitected:Get*",
-      "wellarchitected:List*",
     ]
     resources = ["*"]
   }
@@ -431,5 +428,52 @@ data "aws_iam_policy_document" "ai_discovery_access" {
       "eks:TagResource",
     ]
     resources = ["arn:aws:eks:*:*:access-entry/${var.condor_prefix}-*/*"]
+  }
+
+  # CID's dashboard/dataset/data-source IDs (task P2-06) come from AWS's own
+  # template, not ours to prefix - quicksight:* like bedrock:*/transform:*
+  # in aws_transform.tf, contained by the region lock and Sandbox-only grant.
+  statement {
+    sid       = "AIDiscoveryDashboards"
+    effect    = "Allow"
+    actions   = ["quicksight:*"]
+    resources = ["*"]
+  }
+
+  # The CID dashboards install from a CloudFormation stack (task P2-06),
+  # named with the platform prefix like everything else this set creates -
+  # unlike the QuickSight resources it installs, covered above.
+  statement {
+    sid    = "AIDiscoveryCidStack"
+    effect = "Allow"
+    actions = [
+      "cloudformation:CreateStack",
+      "cloudformation:DeleteStack",
+      "cloudformation:TagResource",
+      "cloudformation:UntagResource",
+      "cloudformation:UpdateStack",
+    ]
+    resources = ["arn:aws:cloudformation:*:*:stack/${var.dp_prefix}-*/*"]
+  }
+
+  statement {
+    sid    = "AIDiscoveryCloudFormationAccountWide"
+    effect = "Allow"
+    actions = [
+      "cloudformation:CreateUploadBucket",
+      "cloudformation:ValidateTemplate",
+    ]
+    resources = ["*"]
+  }
+
+  # Well-Architected workload reviews backing the business case (tasks
+  # P5-01 through P5-04). Workload IDs are service-generated at creation, so
+  # unlike everything else this set creates they can't be prefix-scoped up
+  # front - the same trade as AIDiscoveryKeys above.
+  statement {
+    sid       = "AIDiscoveryWellArchitected"
+    effect    = "Allow"
+    actions   = ["wellarchitected:*"]
+    resources = ["*"]
   }
 }
