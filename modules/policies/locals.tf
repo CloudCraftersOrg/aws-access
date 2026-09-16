@@ -30,6 +30,7 @@ locals {
   # Documents are grouped by audience across devops_agent.tf, aws_transform.tf,
   # ai_governance.tf and edge_ai.tf.
   inline_policies = {
+    AIDiscoveryAccess       = data.aws_iam_policy_document.ai_discovery_access.json
     AIGovernanceAccess      = data.aws_iam_policy_document.ai_governance_access.json
     AIGovernanceAdminAccess = data.aws_iam_policy_document.ai_governance_admin_access.json
     AWSTransformAccess      = data.aws_iam_policy_document.aws_transform_access.json

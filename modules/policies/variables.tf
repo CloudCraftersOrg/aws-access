@@ -2,6 +2,11 @@
 # themselves, which the region lockdown iterates over. The root passes its own
 # variables straight through; the descriptions there are the canonical ones.
 
+variable "condor_prefix" {
+  type        = string
+  description = "Resource name prefix for the Condor Discovery PoC's fake client estate."
+}
+
 variable "demo_app_prefix" {
   type        = string
   description = "Resource name prefix for the demo application stack."
@@ -10,6 +15,11 @@ variable "demo_app_prefix" {
 variable "demo_app_region" {
   type        = string
   description = "Region hosting the partner demo web application."
+}
+
+variable "dp_prefix" {
+  type        = string
+  description = "Resource name prefix for the Condor Discovery PoC's platform stack."
 }
 
 variable "edge_ai_prefix" {
