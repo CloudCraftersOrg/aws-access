@@ -36,6 +36,36 @@ locals {
   #
   # The map key becomes the sid prefix, so keys are PascalCase to match.
   role_scopes = {
+    # Condor Discovery PoC: both the estate's own roles (condor-bootstrap,
+    # instance/task roles) and the platform's (dp-deployer, dp-collector, the
+    # Lambda execution roles) share one scope, matching the two prefixes
+    # ai_discovery.tf grants on.
+    AIDiscovery = {
+      require_boundary = false
+      role_arns = [
+        "arn:aws:iam::*:role/${var.condor_prefix}-*",
+        "arn:aws:iam::*:role/${var.dp_prefix}-*",
+      ]
+      passed_to_services = [
+        "ec2.amazonaws.com",
+        "ecs-tasks.amazonaws.com",
+        "eks.amazonaws.com",
+        "events.amazonaws.com",
+        "lambda.amazonaws.com",
+        "scheduler.amazonaws.com",
+        "states.amazonaws.com",
+      ]
+      service_linked_for = [
+        "autoscaling.amazonaws.com",
+        "config.amazonaws.com",
+        "ecs.amazonaws.com",
+        "eks.amazonaws.com",
+        "elasticache.amazonaws.com",
+        "elasticloadbalancing.amazonaws.com",
+        "rds.amazonaws.com",
+      ]
+    }
+
     DevOpsAgent = {
       require_boundary = false
       role_arns = [

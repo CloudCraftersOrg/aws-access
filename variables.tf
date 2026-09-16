@@ -104,6 +104,13 @@ variable "permission_sets" {
     EdgeAIAccess = {
       description = "Edge AI Landing Zone pilot: govern model delivery, fleet control and inference observability for edge/IoT devices"
     }
+
+    # us-east-1: same reason as AWSTransformAccess, the handoff this PoC
+    # feeds is us-east-1 only. us-west-2: the estate's condor-promo stack.
+    AIDiscoveryAccess = {
+      description     = "Condor Discovery PoC: build the fake client estate and the AWS Transform discovery platform that scans it"
+      allowed_regions = ["us-west-2", "us-east-1"]
+    }
   }
 
   # Requires at least one component, so the degenerate "PT" fails here rather than
@@ -177,7 +184,8 @@ variable "grants" {
       DevOpsAgent    = ["DevOpsAgentAccess"]
       AWSTransform   = ["AWSTransformAccess"]
       AIGovernance   = ["AIGovernanceAccess"]
-      EdgeAI         = ["EdgeAIAccess"] # must exist as a group in the base repo first
+      EdgeAI         = ["EdgeAIAccess"]      # must exist as a group in the base repo first
+      AIDiscovery    = ["AIDiscoveryAccess"] # must exist as a group in the base repo first
     }
   }
 
@@ -228,6 +236,14 @@ variable "grants" {
 # bury them under prefixes like demo_app_prefix. Grouped by purpose, then sorted
 # inside each group.
 
+# Resource prefix for the Condor Discovery PoC's fake client estate
+# (condor-tfstate, condor-trail, condor-bootstrap, condor-cur, ...).
+variable "condor_prefix" {
+  type        = string
+  description = "Resource name prefix for the Condor Discovery PoC's fake client estate."
+  default     = "condor"
+}
+
 # Resource prefix scoping the demo stack's IAM, S3 and Secrets Manager access.
 # Everything that stack creates must carry this prefix or it hits those denials.
 variable "demo_app_prefix" {
@@ -265,6 +281,14 @@ variable "role_boundary_policy_name" {
   type        = string
   description = "Name of the permissions boundary, created by the base repo, required on roles created through a permission set."
   default     = "DelegatedRoleBoundary"
+}
+
+# Resource prefix for the Condor Discovery PoC's platform stack
+# (dp-deployer, dp-collector, dp-raw, dp-lake, the Lambda collectors, ...).
+variable "dp_prefix" {
+  type        = string
+  description = "Resource name prefix for the Condor Discovery PoC's platform stack."
+  default     = "dp"
 }
 
 # Prefix the transform-agents PoC stack's DynamoDB, Lambda, ECR, Scheduler, S3,
