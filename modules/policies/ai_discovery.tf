@@ -412,6 +412,19 @@ data "aws_iam_policy_document" "ai_discovery_access" {
     ]
   }
 
+  # Creating condor-bootstrap/dp-deployer (above) is pointless without this:
+  # a role's trust policy alone doesn't let the caller assume it, the
+  # caller's own identity policy has to allow sts:AssumeRole too.
+  statement {
+    sid     = "AIDiscoveryAssumeOwnRoles"
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    resources = [
+      "arn:aws:iam::*:role/${var.condor_prefix}-*",
+      "arn:aws:iam::*:role/${var.dp_prefix}-*",
+    ]
+  }
+
   # EKS access entries for dp-collector (task P2-04) and the human-owned
   # planted IAM users (dev.*, svc.*) the estate needs. iam:CreateUser itself
   # is out of scope for every set in this repo except the base repo's own
