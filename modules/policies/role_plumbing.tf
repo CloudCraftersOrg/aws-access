@@ -47,6 +47,9 @@ locals {
         "ec2.amazonaws.com",
         "ecs-tasks.amazonaws.com",
         "eks.amazonaws.com",
+        # FIS assumes the experiment execution role; the caller needs PassRole
+        # when creating or updating an experiment template that embeds a role ARN.
+        "fis.amazonaws.com",
         "lambda.amazonaws.com",
         "monitoring.rds.amazonaws.com",
         "vpc-flow-logs.amazonaws.com",
@@ -58,6 +61,7 @@ locals {
         "eks.amazonaws.com",
         "elasticloadbalancing.amazonaws.com",
         "rds.amazonaws.com",
+        "resiliencehub.amazonaws.com",
       ]
     }
 

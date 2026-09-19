@@ -174,6 +174,10 @@ data "aws_iam_policy_document" "devops_agent_access" {
       "events:TagResource",
       "events:UntagResource",
 
+      # AWS Fault Injection Service — create/manage experiment templates,
+      # start and stop experiments, and view results.
+      "fis:*",
+
       "lambda:*",
 
       "logs:CreateLogGroup",
@@ -190,6 +194,11 @@ data "aws_iam_policy_document" "devops_agent_access" {
       "logs:UntagLogGroup",
 
       "rds:*",
+
+      # AWS Resilience Hub — create/manage resilience policies, run assessments,
+      # and view recommendations.
+      "resiliencehub:*",
+
       "servicediscovery:*",
 
       "sns:CreateTopic",
