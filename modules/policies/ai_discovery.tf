@@ -35,6 +35,7 @@ data "aws_iam_policy_document" "ai_discovery_access" {
       "cloudformation:List*",
       "cloudtrail:Describe*",
       "cloudtrail:Get*",
+      "codepipeline:ListPipelines",
       "cloudtrail:List*",
       "cloudtrail:LookupEvents",
       "compute-optimizer:Describe*",
@@ -513,14 +514,8 @@ data "aws_iam_policy_document" "ai_discovery_access" {
   }
 
   # Console access to approve condor-tienda's pipeline (task P1-06) -
-  # CodeBuild/CodeDeploy cut for the 10240-byte inline-policy limit (confirmed live).
-  statement {
-    sid       = "AIDiscoveryPipelinesList"
-    effect    = "Allow"
-    actions   = ["codepipeline:ListPipelines"]
-    resources = ["*"]
-  }
-
+  # ListPipelines folded into AIDiscoveryReadOnly above (10240-byte
+  # inline-policy limit, confirmed live).
   statement {
     sid    = "AIDiscoveryPipelines"
     effect = "Allow"
