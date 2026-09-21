@@ -512,25 +512,12 @@ data "aws_iam_policy_document" "ai_discovery_access" {
     resources = ["*"]
   }
 
-  # Console access to browse and operate condor-tienda's Developer Tools
-  # pipeline end to end (task P1-06) - list actions have no resource-level
-  # support, so account-wide; everything else scoped to condor-* resources.
+  # Console access to approve condor-tienda's pipeline (task P1-06) -
+  # CodeBuild/CodeDeploy cut for the 10240-byte inline-policy limit (confirmed live).
   statement {
-    sid    = "AIDiscoveryDevToolsList"
-    effect = "Allow"
-    actions = [
-      "codepipeline:ListPipelines",
-      "codebuild:ListProjects",
-      "codebuild:ListBuilds",
-      "codedeploy:ListApplications",
-      "codedeploy:ListDeployments",
-      "codedeploy:ListDeploymentGroups",
-      "codedeploy:BatchGetApplications",
-      "codedeploy:BatchGetDeployments",
-      "codedeploy:BatchGetDeploymentGroups",
-      "codedeploy:GetDeploymentTarget",
-      "codedeploy:ListDeploymentTargets",
-    ]
+    sid       = "AIDiscoveryPipelinesList"
+    effect    = "Allow"
+    actions   = ["codepipeline:ListPipelines"]
     resources = ["*"]
   }
 
@@ -541,39 +528,7 @@ data "aws_iam_policy_document" "ai_discovery_access" {
       "codepipeline:Get*",
       "codepipeline:List*",
       "codepipeline:PutApprovalResult",
-      "codepipeline:RetryStageExecution",
-      "codepipeline:StartPipelineExecution",
-      "codepipeline:StopPipelineExecution",
     ]
     resources = ["arn:aws:codepipeline:*:*:${var.condor_prefix}-*"]
-  }
-
-  statement {
-    sid    = "AIDiscoveryCodeBuildProjects"
-    effect = "Allow"
-    actions = [
-      "codebuild:BatchGetBuilds",
-      "codebuild:BatchGetProjects",
-      "codebuild:ListBuildsForProject",
-      "codebuild:StartBuild",
-      "codebuild:StopBuild",
-    ]
-    resources = ["arn:aws:codebuild:*:*:project/${var.condor_prefix}-*"]
-  }
-
-  # Deployment IDs are generated at creation, not prefix-scopable, same
-  # trade as AIDiscoveryKeys above - application/deployment-group names are.
-  statement {
-    sid    = "AIDiscoveryCodeDeploy"
-    effect = "Allow"
-    actions = [
-      "codedeploy:GetApplication",
-      "codedeploy:GetApplicationRevision",
-      "codedeploy:GetDeployment",
-      "codedeploy:GetDeploymentConfig",
-      "codedeploy:GetDeploymentGroup",
-      "codedeploy:StopDeployment",
-    ]
-    resources = ["*"]
   }
 }
