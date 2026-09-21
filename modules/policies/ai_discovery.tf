@@ -490,20 +490,23 @@ data "aws_iam_policy_document" "ai_discovery_access" {
     resources = ["*"]
   }
 
-  # Console visibility to approve condor-tienda's GitHub connection
-  # (tasks/HANDOFF-P1-06.md) - the handshake itself is a browser OAuth flow
-  # against GitHub with no API equivalent, this only lets the console see
-  # and click it. Connection IDs are generated at creation, not
-  # prefix-scopable, same trade as AIDiscoveryKeys above.
+  # Console access to approve condor-tienda's GitHub connection
+  # (tasks/HANDOFF-P1-06.md). StartOAuthHandshake/ListTagsForResource were
+  # missing on the first pass - confirmed live, both gate the console's
+  # "Update pending connection" button before it hands off to GitHub.
   statement {
     sid    = "AIDiscoveryConnections"
     effect = "Allow"
     actions = [
       "codestar-connections:GetConnection",
       "codestar-connections:ListConnections",
+      "codestar-connections:ListTagsForResource",
+      "codestar-connections:StartOAuthHandshake",
       "codestar-connections:UpdateConnectionInstallation",
       "codeconnections:GetConnection",
       "codeconnections:ListConnections",
+      "codeconnections:ListTagsForResource",
+      "codeconnections:StartOAuthHandshake",
       "codeconnections:UpdateConnectionInstallation",
     ]
     resources = ["*"]
