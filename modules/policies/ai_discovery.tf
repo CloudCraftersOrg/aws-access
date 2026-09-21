@@ -493,16 +493,12 @@ data "aws_iam_policy_document" "ai_discovery_access" {
 
   # Console access to approve condor-tienda's GitHub connection
   # (tasks/HANDOFF-P1-06.md) - confirmed live one missing action at a time.
+  # Every live AccessDenied named codeconnections:*, never the older
+  # codestar-connections:* alias, so only the former is granted.
   statement {
     sid    = "AIDiscoveryConnections"
     effect = "Allow"
     actions = [
-      "codestar-connections:GetConnection",
-      "codestar-connections:GetIndividualAccessToken",
-      "codestar-connections:ListConnections",
-      "codestar-connections:ListTagsForResource",
-      "codestar-connections:StartOAuthHandshake",
-      "codestar-connections:UpdateConnectionInstallation",
       "codeconnections:GetConnection",
       "codeconnections:GetIndividualAccessToken",
       "codeconnections:ListConnections",
