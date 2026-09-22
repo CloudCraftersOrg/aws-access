@@ -285,17 +285,6 @@ variable "role_boundary_policy_name" {
 
 # Resource prefix for the Condor Discovery PoC's platform stack
 # (dp-deployer, dp-collector, dp-raw, dp-lake, the Lambda collectors, ...).
-# The state bucket is the base repo's, not this stack's, and it is outside both
-# the condor- and dp- prefixes - which is exactly why AIDiscoveryAccess could not
-# reach it. Named here rather than wildcarded: a policy that granted
-# arn:aws:s3:::*-tfstate/* would follow any future bucket someone happens to name
-# that way.
-variable "discovery_state_bucket" {
-  type        = string
-  description = "Bucket holding ai-discovery-tool's Terraform state and its engagement tfvars. Created by the base repo."
-  default     = "sacm-sandbox-tfstate"
-}
-
 variable "dp_prefix" {
   type        = string
   description = "Resource name prefix for the Condor Discovery PoC's platform stack."

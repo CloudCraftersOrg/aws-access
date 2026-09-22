@@ -14,6 +14,20 @@
 # Not modeled here at all: the GitHub App `dp-discovery-reader` (task P2-04)
 # is not an AWS resource - it is created by hand by a GitHub org owner,
 # outside this repo.
+locals {
+  # ai-discovery-tool's Terraform state and its engagement tfvars, in the base
+  # repo's bucket. Outside both the condor- and dp- prefixes, which is exactly
+  # why this set could not reach it.
+  #
+  # A local rather than a variable: there is one of these and nobody overrides
+  # it, so a variable would be three files of wiring - root variable, module
+  # argument, module variable - to carry one constant into one statement.
+  #
+  # Named rather than wildcarded. A policy granting arn:aws:s3:::*-tfstate/*
+  # would follow any future bucket someone happens to name that way.
+  discovery_state_bucket = "sacm-sandbox-tfstate"
+}
+
 data "aws_iam_policy_document" "ai_discovery_access" {
   # The console/IAM read pair and the AIDiscovery role plumbing, both from
   # role_plumbing.tf.
@@ -531,8 +545,8 @@ data "aws_iam_policy_document" "ai_discovery_access" {
     effect  = "Allow"
     actions = ["s3:DeleteObject", "s3:GetObject", "s3:ListBucket", "s3:PutObject"]
     resources = [
-      "arn:aws:s3:::${var.discovery_state_bucket}",
-      "arn:aws:s3:::${var.discovery_state_bucket}/ai-discovery-tool/*",
+      "arn:aws:s3:::${local.discovery_state_bucket}",
+      "arn:aws:s3:::${local.discovery_state_bucket}/ai-discovery-tool/*",
     ]
   }
 
