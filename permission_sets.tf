@@ -13,6 +13,7 @@ module "policies" {
   condor_prefix              = var.condor_prefix
   demo_app_prefix            = var.demo_app_prefix
   demo_app_region            = var.demo_app_region
+  discovery_state_bucket     = var.discovery_state_bucket
   dp_prefix                  = var.dp_prefix
   transform_agents_prefix    = var.transform_agents_prefix
   transform_container_prefix = var.transform_container_prefix

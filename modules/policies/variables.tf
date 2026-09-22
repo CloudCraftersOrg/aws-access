@@ -17,6 +17,11 @@ variable "demo_app_region" {
   description = "Region hosting the partner demo web application."
 }
 
+variable "discovery_state_bucket" {
+  type        = string
+  description = "Bucket holding ai-discovery-tool's Terraform state and engagement tfvars."
+}
+
 variable "dp_prefix" {
   type        = string
   description = "Resource name prefix for the Condor Discovery PoC's platform stack."

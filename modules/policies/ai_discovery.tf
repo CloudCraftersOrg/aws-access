@@ -51,9 +51,6 @@ data "aws_iam_policy_document" "ai_discovery_access" {
       "ecr:Describe*",
       "ecr:Get*",
       "ecr:List*",
-      "eks:Describe*",
-      "eks:List*",
-      "elasticache:Describe*",
       "events:Describe*",
       "events:List*",
       "glue:Get*",
@@ -68,14 +65,8 @@ data "aws_iam_policy_document" "ai_discovery_access" {
       "logs:Describe*",
       "logs:FilterLogEvents",
       "logs:Get*",
-      "network-firewall:Describe*",
-      "network-firewall:List*",
       "ram:Get*",
       "ram:List*",
-      "rds:Describe*",
-      "rds:List*",
-      "route53resolver:Get*",
-      "route53resolver:List*",
       "secretsmanager:DescribeSecret",
       "secretsmanager:ListSecrets",
       "sns:Get*",
@@ -290,20 +281,20 @@ data "aws_iam_policy_document" "ai_discovery_access" {
   }
 
   # dp-canonical Aurora Serverless v2, named like the rest of the platform.
+  #
+  # Collapsed from eight enumerated verbs per permission_sets.tf's own remedy for
+  # the 10,240-byte limit. It widens nothing: AIDiscoveryEstateCompute already
+  # grants rds:* on "*", which means the enumerated list was decorative - every
+  # verb in it was allowed account-wide anyway.
+  #
+  # Worth a separate look: that wide grant defeats this statement's prefix
+  # scoping entirely. Narrowing it to rds:Describe*/rds:List* would make
+  # "dp-* only" true again. Not done here because it changes behaviour, and this
+  # PR is about adding access rather than removing it.
   statement {
-    sid    = "AIDiscoveryCanonicalStore"
-    effect = "Allow"
-    actions = [
-      "rds-data:*",
-      "rds:AddTagsToResource",
-      "rds:CreateDBCluster",
-      "rds:CreateDBInstance",
-      "rds:DeleteDBCluster",
-      "rds:DeleteDBInstance",
-      "rds:ModifyDBCluster",
-      "rds:ModifyDBInstance",
-      "rds:RemoveTagsFromResource",
-    ]
+    sid     = "AIDiscoveryCanonicalStore"
+    effect  = "Allow"
+    actions = ["rds-data:*", "rds:*"]
     resources = [
       "arn:aws:rds:*:*:cluster:${var.dp_prefix}-*",
       "arn:aws:rds:*:*:db:${var.dp_prefix}-*",
@@ -352,19 +343,15 @@ data "aws_iam_policy_document" "ai_discovery_access" {
   # GetSecretValue on dp/* and an explicit deny on condor/* there. This set
   # additionally needs the write verbs dp-collector does not, to create the
   # secrets in the first place.
+  #
+  # Collapsed from eight enumerated verbs, per permission_sets.tf's own remedy
+  # for the 10,240-byte limit. This one does widen - there is no account-wide
+  # secretsmanager grant - but only within secret:dp/*, and the prefix is what
+  # contains this statement, not the verb list.
   statement {
-    sid    = "AIDiscoverySecrets"
-    effect = "Allow"
-    actions = [
-      "secretsmanager:CreateSecret",
-      "secretsmanager:DeleteSecret",
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:PutSecretValue",
-      "secretsmanager:RestoreSecret",
-      "secretsmanager:TagResource",
-      "secretsmanager:UntagResource",
-      "secretsmanager:UpdateSecret",
-    ]
+    sid       = "AIDiscoverySecrets"
+    effect    = "Allow"
+    actions   = ["secretsmanager:*"]
     resources = ["arn:aws:secretsmanager:*:*:secret:${var.dp_prefix}/*"]
   }
 
@@ -431,16 +418,13 @@ data "aws_iam_policy_document" "ai_discovery_access" {
   # is out of scope for every set in this repo except the base repo's own
   # bootstrap - this set only manages the users' presence in the estate's
   # answer key metadata, not real credentials.
+  #
+  # Collapsed per the same remedy, and decorative for the same reason as
+  # AIDiscoveryCanonicalStore: eks:* on "*" is already granted above.
   statement {
-    sid    = "AIDiscoveryEksAccess"
-    effect = "Allow"
-    actions = [
-      "eks:AssociateAccessPolicy",
-      "eks:CreateAccessEntry",
-      "eks:DeleteAccessEntry",
-      "eks:DisassociateAccessPolicy",
-      "eks:TagResource",
-    ]
+    sid       = "AIDiscoveryEksAccess"
+    effect    = "Allow"
+    actions   = ["eks:*"]
     resources = ["arn:aws:eks:*:*:access-entry/${var.condor_prefix}-*/*"]
   }
 
@@ -507,6 +491,49 @@ data "aws_iam_policy_document" "ai_discovery_access" {
       "codeconnections:UpdateConnectionInstallation",
     ]
     resources = ["*"]
+  }
+
+  # 60-console builds the Site and the Console: a distribution each, an origin
+  # access control, a viewer-request function and a response headers policy.
+  # None of it was reachable - CloudFront and Cognito were not granted at all,
+  # so the layer could only ever be applied by CI's admin role.
+  #
+  # Account-wide because distribution, OAC, policy and user-pool ARNs are all
+  # generated IDs, not names - the same trade already taken by
+  # AIDiscoveryEstateCompute above. One difference worth stating plainly: that
+  # statement is contained by the region lock and this one is NOT, because
+  # CloudFront is global and sits in the lockdown's NotAction list. What
+  # contains this is the Sandbox-only assignment.
+  statement {
+    sid       = "AIDiscoveryConsoleEdge"
+    effect    = "Allow"
+    actions   = ["cloudfront:*", "cognito-identity:*", "cognito-idp:*"]
+    resources = ["*"]
+  }
+
+  # ai-discovery-tool keeps two things in the base repo's state bucket: layer
+  # state under ai-discovery-tool/<engagement>/, and each engagement's tfvars
+  # under ai-discovery-tool/engagements/. Both are outside the condor- and dp-
+  # prefixes AIDiscoveryBuckets covers, so a holder could plan and apply through
+  # CI but could not run `make plan`, `make destroy-engagement`, or change which
+  # surfaces an engagement enables.
+  #
+  # Objects are scoped to the ai-discovery-tool/ prefix. ListBucket is not: the
+  # S3 backend needs it on the bucket, and a prefix condition on top costs more
+  # bytes than this policy has (see the note on the 10240-byte limit below).
+  # It exposes the NAMES of other projects' state keys, never their contents.
+  #
+  # DeleteObject is for use_lockfile: the .tflock object is written next to the
+  # state key and removed on release. Without it every apply leaves a lock
+  # behind and the next one blocks.
+  statement {
+    sid     = "AIDiscoveryToolState"
+    effect  = "Allow"
+    actions = ["s3:DeleteObject", "s3:GetObject", "s3:ListBucket", "s3:PutObject"]
+    resources = [
+      "arn:aws:s3:::${var.discovery_state_bucket}",
+      "arn:aws:s3:::${var.discovery_state_bucket}/ai-discovery-tool/*",
+    ]
   }
 
   # Console access to approve condor-tienda's pipeline (task P1-06) -
