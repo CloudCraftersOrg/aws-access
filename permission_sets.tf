@@ -8,6 +8,7 @@ module "policies" {
   source = "./modules/policies"
 
   permission_sets            = var.permission_sets
+  ai_support_prefix          = var.ai_support_prefix
   region                     = var.region
   role_boundary_policy_name  = var.role_boundary_policy_name
   condor_prefix              = var.condor_prefix
