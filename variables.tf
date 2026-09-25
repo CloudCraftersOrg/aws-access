@@ -252,13 +252,6 @@ variable "demo_app_prefix" {
   default     = "transform-demo"
 }
 
-# The partner service is not available in var.region.
-variable "demo_app_region" {
-  type        = string
-  description = "Region hosting the partner demo web application."
-  default     = "us-east-1"
-}
-
 # The permissions boundary that roles created through a permission set must
 # carry. Created by the base repo's bootstrap stack in every account, because
 # this stack has no iam:CreatePolicy and runs against the management account

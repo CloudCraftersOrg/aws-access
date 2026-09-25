@@ -459,10 +459,15 @@ data "aws_iam_policy_document" "ai_discovery_access" {
   # CID's dashboard/dataset/data-source IDs (task P2-06) come from AWS's own
   # template, not ours to prefix - quicksight:* like bedrock:*/transform:*
   # in aws_transform.tf, contained by the region lock and Sandbox-only grant.
+  #
+  # ds:CreateIdentityPoolDirectory and ds:DescribeDirectories are required for
+  # QuickSight's initial account signup - it creates an internal directory for
+  # its identity pool. Without them the signup page fails with an IAM error
+  # before quicksight:* is ever reached.
   statement {
     sid       = "AIDiscoveryDashboards"
     effect    = "Allow"
-    actions   = ["quicksight:*"]
+    actions   = ["quicksight:*", "ds:CreateIdentityPoolDirectory", "ds:DescribeDirectories"]
     resources = ["*"]
   }
 
