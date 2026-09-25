@@ -12,11 +12,6 @@ variable "demo_app_prefix" {
   description = "Resource name prefix for the demo application stack."
 }
 
-variable "demo_app_region" {
-  type        = string
-  description = "Region hosting the partner demo web application."
-}
-
 variable "dp_prefix" {
   type        = string
   description = "Resource name prefix for the Condor Discovery PoC's platform stack."
