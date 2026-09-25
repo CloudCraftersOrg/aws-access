@@ -12,7 +12,6 @@ module "policies" {
   role_boundary_policy_name  = var.role_boundary_policy_name
   condor_prefix              = var.condor_prefix
   demo_app_prefix            = var.demo_app_prefix
-  demo_app_region            = var.demo_app_region
   dp_prefix                  = var.dp_prefix
   transform_agents_prefix    = var.transform_agents_prefix
   transform_container_prefix = var.transform_container_prefix
