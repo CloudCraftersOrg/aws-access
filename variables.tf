@@ -111,6 +111,12 @@ variable "permission_sets" {
       description     = "Condor Discovery PoC: build the fake client estate and the AWS Transform discovery platform that scans it"
       allowed_regions = ["us-west-2", "us-east-1"]
     }
+
+    # us-east-1: the cohort's stack defaults there. us-west-2: var.region.
+    AIAugmentedSupportAccess = {
+      description     = "AI-augmented support: Amazon Connect with Q in Connect, Bedrock agents and knowledge bases, and the serverless stack behind them"
+      allowed_regions = ["us-west-2", "us-east-1"]
+    }
   }
 
   # Requires at least one component, so the degenerate "PT" fails here rather than
@@ -179,13 +185,14 @@ variable "grants" {
     # reaches its cohort. Exercising AWSTransformAccess means joining AWSTransform
     # in the base repo, the same as every other specialised set.
     Sandbox = {
-      Administrators = ["AdministratorAccess", "ReadOnlyAccess"]
-      ReadOnly       = ["ReadOnlyAccess"]
-      DevOpsAgent    = ["DevOpsAgentAccess"]
-      AWSTransform   = ["AWSTransformAccess"]
-      AIGovernance   = ["AIGovernanceAccess"]
-      EdgeAI         = ["EdgeAIAccess"]      # must exist as a group in the base repo first
-      AIDiscovery    = ["AIDiscoveryAccess"] # must exist as a group in the base repo first
+      Administrators     = ["AdministratorAccess", "ReadOnlyAccess"]
+      ReadOnly           = ["ReadOnlyAccess"]
+      DevOpsAgent        = ["DevOpsAgentAccess"]
+      AWSTransform       = ["AWSTransformAccess"]
+      AIGovernance       = ["AIGovernanceAccess"]
+      EdgeAI             = ["EdgeAIAccess"]             # must exist as a group in the base repo first
+      AIDiscovery        = ["AIDiscoveryAccess"]        # must exist as a group in the base repo first
+      AIAugmentedSupport = ["AIAugmentedSupportAccess"] # must exist as a group in the base repo first
     }
   }
 
@@ -235,6 +242,14 @@ variable "grants" {
 # a reviewer reads to approve an access change, and sorting the whole file would
 # bury them under prefixes like demo_app_prefix. Grouped by purpose, then sorted
 # inside each group.
+
+# Resource prefix for the AI-augmented support cohort's stack (Lambda functions,
+# DynamoDB tables, S3 buckets, IAM roles, log groups, ...).
+variable "ai_support_prefix" {
+  type        = string
+  description = "Resource name prefix for the AI-augmented support cohort's stack."
+  default     = "ai-support"
+}
 
 # Resource prefix for the Condor Discovery PoC's fake client estate
 # (condor-tfstate, condor-trail, condor-bootstrap, condor-cur, ...).
