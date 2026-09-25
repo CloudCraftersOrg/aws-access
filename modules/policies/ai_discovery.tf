@@ -460,14 +460,27 @@ data "aws_iam_policy_document" "ai_discovery_access" {
   # template, not ours to prefix - quicksight:* like bedrock:*/transform:*
   # in aws_transform.tf, contained by the region lock and Sandbox-only grant.
   #
-  # ds:CreateIdentityPoolDirectory and ds:DescribeDirectories are required for
-  # QuickSight's initial account signup - it creates an internal directory for
-  # its identity pool. Without them the signup page fails with an IAM error
-  # before quicksight:* is ever reached.
+  # QuickSight signup requires the full ds: set below plus iam:ListAccountAliases
+  # and s3:ListAllMyBuckets - confirmed against the AWS docs example for
+  # "create Enterprise account with managed users". Without them the signup
+  # page fails before quicksight:* is ever reached.
+  # Doc <https://docs.aws.amazon.com/quick/latest/userguide/iam-policy-examples.html>
   statement {
-    sid       = "AIDiscoveryDashboards"
-    effect    = "Allow"
-    actions   = ["quicksight:*", "ds:CreateIdentityPoolDirectory", "ds:DescribeDirectories"]
+    sid    = "AIDiscoveryDashboards"
+    effect = "Allow"
+    actions = [
+      "quicksight:*",
+      "ds:AuthorizeApplication",
+      "ds:UnauthorizeApplication",
+      "ds:CheckAlias",
+      "ds:CreateAlias",
+      "ds:CreateIdentityPoolDirectory",
+      "ds:DeleteDirectory",
+      "ds:DescribeDirectories",
+      "ds:DescribeTrusts",
+      "iam:ListAccountAliases",
+      "s3:ListAllMyBuckets",
+    ]
     resources = ["*"]
   }
 
