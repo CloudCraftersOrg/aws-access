@@ -36,6 +36,22 @@ locals {
   #
   # The map key becomes the sid prefix, so keys are PascalCase to match.
   role_scopes = {
+    # AI-augmented support: Lambda execution roles, and the service roles Bedrock
+    # agents and knowledge bases run under. Connect creates its own
+    # service-linked role on instance creation.
+    AIAugmentedSupport = {
+      require_boundary = false
+      role_arns        = ["arn:aws:iam::*:role/${var.ai_support_prefix}-*"]
+      passed_to_services = [
+        "apigateway.amazonaws.com",
+        "bedrock.amazonaws.com",
+        "lambda.amazonaws.com",
+      ]
+      service_linked_for = [
+        "connect.amazonaws.com",
+      ]
+    }
+
     # Condor Discovery PoC: both the estate's own roles (condor-bootstrap,
     # instance/task roles) and the platform's (dp-deployer, dp-collector, the
     # Lambda execution roles) share one scope, matching the two prefixes

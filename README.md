@@ -118,6 +118,7 @@ which is 4. `variables.tf` is the source of truth for all of it; this table is a
 | `DevOpsAgentAccess` | inline `devops_agent_access` | `us-east-1`, `us-west-2` |
 | `ReadOnlyAccess` | managed `ReadOnlyAccess` | `us-west-2` |
 | `EdgeAIAccess` | inline `edge_ai_access` | `us-west-2` |
+| `AIAugmentedSupportAccess` | inline `ai_augmented_support_access` | `us-west-2`, `us-east-1` |
 
 The inline documents are grouped by audience across `devops_agent.tf`,
 `aws_transform.tf`, `ai_governance.tf` and `edge_ai.tf`. `local.inline_policies`
@@ -144,6 +145,7 @@ Grants are `account name → group display name → permission set names`:
 | | `DevOpsAgent` | DevOpsAgent |
 | | `AIGovernance` | AIGovernanceAccess |
 | | `EdgeAI` | EdgeAIAccess |
+| | `AIAugmentedSupport` | AIAugmentedSupportAccess |
 
 Only groups are ever assigned. There are no user-level assignments, by design.
 
@@ -580,7 +582,8 @@ modules/policies/
 ├── role_plumbing.tf          CreateRole / PassRole / service-linked, per scope
 ├── devops_agent.tf           DevOpsAgentAccess
 ├── aws_transform.tf          AWSTransformAccess
-└── ai_governance.tf          AIGovernanceAccess, AIGovernanceAdminAccess
+├── ai_governance.tf          AIGovernanceAccess, AIGovernanceAdminAccess
+└── ai_augmented_support.tf   AIAugmentedSupportAccess
 ```
 
 Each document is the snake_case of the set it backs, so
@@ -615,6 +618,7 @@ S3-native; there is no DynamoDB table.
 | `transform_agents_prefix` | Resource prefix scoping the transform-agents PoC | `transform-agents` |
 | `transform_container_prefix` | Resource prefix scoping the transform-containers PoC | `transform-containers` |
 | `edge_ai_prefix` | Resource prefix scoping the Edge AI Landing Zone pilot | `edge-ai` |
+| `ai_support_prefix` | Resource prefix scoping the AI-augmented support stack | `ai-support` |
 
 ### Outputs
 
